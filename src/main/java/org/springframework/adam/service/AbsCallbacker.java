@@ -42,12 +42,18 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 	 * @param e
 	 */
 	public abstract void dealComplete(T result, E e);
+	
+	/**
+	 * @param e
+	 */
+	public abstract void dealException(Throwable t);
 
 	public void onSuccess(T result) {
 		loopWaitChain();
 		try {
 			dealSuccess(result);
 		} catch (Throwable t) {
+			dealException(t);
 			output.setResultMsg("callback system success method error occor:" + AdamExceptionUtils.getStackTrace(t));
 		} finally {
 			onComplete(result, null);
@@ -65,6 +71,7 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 		try {
 			latch.await();
 		} catch (InterruptedException e) {
+			dealException(e);
 			throw new RuntimeException("callback error can not wait service chain and output", e);
 		}
 	}
@@ -74,6 +81,7 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 		try {
 			dealFail(e);
 		} catch (Throwable t) {
+			dealException(t);
 			output.setResultMsg("callback system fail method error occor:" + AdamExceptionUtils.getStackTrace(t));
 		} finally {
 			onComplete(null, e);
@@ -89,6 +97,7 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 		try {
 			dealComplete(result, e);
 		} catch (Throwable t) {
+			dealException(t);
 			output.setResultMsg("callback system complete method error occor:" + AdamExceptionUtils.getStackTrace(t));
 		} finally {
 			if (null == serviceChain) {
