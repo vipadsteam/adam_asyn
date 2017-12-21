@@ -4,9 +4,9 @@
 package org.springframework.adam.service;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.adam.common.bean.ResultVo;
-import org.springframework.adam.common.utils.AdamExceptionUtils;
 import org.springframework.adam.service.chain.ServiceChain;
 
 /**
@@ -15,17 +15,24 @@ import org.springframework.adam.service.chain.ServiceChain;
  */
 public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 
-	protected ServiceChain serviceChain;
+	protected volatile ServiceChain serviceChain;
 
-	protected T1 income;
+	protected volatile T1 income;
 
-	protected ResultVo<T2> output;
+	protected volatile ResultVo<T2> output;
 
 	protected boolean isDualComplete = false;
 
-	protected boolean isWait = false;
+	protected ThreadPoolExecutor tpe;
 
-	private CountDownLatch latch = new CountDownLatch(1);
+	private final CountDownLatch latch = new CountDownLatch(1);
+
+	private long motherThreadId;
+
+	public AbsCallbacker(long motherThreadId) {
+		super();
+		this.motherThreadId = motherThreadId;
+	}
 
 	/**
 	 * @param result
@@ -42,19 +49,17 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 	 * @param e
 	 */
 	public abstract void dealComplete(T result, E e);
-	
+
 	/**
 	 * @param e
 	 */
 	public abstract void dealException(Throwable t);
 
 	public void onSuccess(T result) {
-		loopWaitChain();
 		try {
 			dealSuccess(result);
 		} catch (Throwable t) {
 			dealException(t);
-			output.setResultMsg("callback system success method error occor:" + AdamExceptionUtils.getStackTrace(t));
 		} finally {
 			onComplete(result, null);
 		}
@@ -64,10 +69,10 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 	 * 防止返回太快，还没执行完回调函数就回调了
 	 */
 	private void loopWaitChain() {
-		if (isWait) {
+		long id = Thread.currentThread().getId();
+		if (id == motherThreadId) {
 			return;
 		}
-		isWait = true;
 		try {
 			latch.await();
 		} catch (InterruptedException e) {
@@ -77,12 +82,10 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 	}
 
 	public void onFail(E e) {
-		loopWaitChain();
 		try {
 			dealFail(e);
 		} catch (Throwable t) {
 			dealException(t);
-			output.setResultMsg("callback system fail method error occor:" + AdamExceptionUtils.getStackTrace(t));
 		} finally {
 			onComplete(null, e);
 		}
@@ -93,18 +96,41 @@ public abstract class AbsCallbacker<T, E extends Throwable, T1, T2> {
 			return;
 		}
 		isDualComplete = true;
-		loopWaitChain();
 		try {
 			dealComplete(result, e);
 		} catch (Throwable t) {
 			dealException(t);
-			output.setResultMsg("callback system complete method error occor:" + AdamExceptionUtils.getStackTrace(t));
 		} finally {
-			if (null == serviceChain) {
-				return;
+			if (null == tpe) {
+				workNext();
+			} else {
+				try {
+					tpe.execute(new Runnable() {
+						@Override
+						public void run() {
+							workNext();
+						}
+					});
+				} catch (Throwable t) {
+					dealException(t);
+				}
 			}
-			serviceChain.doTask(income, output);
 		}
+	}
+
+	/**
+	 * 下一个任务
+	 */
+	private void workNext() {
+		loopWaitChain();
+		if (null == serviceChain) {
+			return;
+		}
+		serviceChain.doTask(income, output);
+	}
+
+	public void setThreadPoolExcutor(ThreadPoolExecutor tpe) {
+		this.tpe = tpe;
 	}
 
 	/**
