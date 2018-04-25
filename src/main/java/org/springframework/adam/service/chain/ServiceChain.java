@@ -26,6 +26,7 @@ import org.springframework.adam.common.utils.AdamExceptionUtils;
 import org.springframework.adam.common.utils.context.SpringContextUtils;
 import org.springframework.adam.service.AbsCallbacker;
 import org.springframework.adam.service.AbsTasker;
+import org.springframework.adam.service.AdamFuture;
 import org.springframework.adam.service.IService;
 import org.springframework.adam.service.IServiceBefore;
 import org.springframework.adam.service.task.DoComplateTasker;
@@ -149,6 +150,7 @@ public class ServiceChain {
 		for (int index = 0; index < serviceList.size(); index++) {
 			IService serviceTmp = serviceList.get(index);
 			ServiceOrder serviceOrderTmp = (ServiceOrder) AdamClassUtils.getTargetClass(serviceTmp).getAnnotation(ServiceOrder.class);
+			// 没设置serviceorder默认第一个
 			if (null == serviceOrderTmp) {
 				realIndex = 0;
 				break;
@@ -160,6 +162,7 @@ public class ServiceChain {
 				realIndex++;
 			}
 		}
+		// 这样不会干掉以前的service，但是会在以前的service前插入新的service
 		serviceList.add(realIndex, serivce);
 	}
 
@@ -189,8 +192,15 @@ public class ServiceChain {
 		output.setTaskerList(taskList);
 		// 塞进serviceChain
 		output.setServiceChain(this);
+		// 获取future
+		AdamFuture future = output.getFuture();
 		// 正式处理任务
-		doTask(income, output);
+		if (null == future) {
+			doTask(income, output);
+		} else {
+			// 如果future不为空则表明链条聚合
+			future.init(this, income, output);
+		}
 	}
 
 	/**
@@ -202,12 +212,24 @@ public class ServiceChain {
 	 */
 	@SuppressWarnings("unchecked")
 	public void doTask(Object income, ResultVo output) {
-
 		// 获取当前的index
 		int index = output.getServiceIndex();
 
 		// 如果没处理完任务链则继续处理，处理完了则结束
 		if (index >= output.taskerList().size()) {
+			// 结束前调用一下future
+			AdamFuture future = output.getFuture();
+			if (null != future) {
+				future.setLastIncome(income);
+				future.setLastOutput(output);
+				try {
+					future.workNext();
+				} catch (Throwable t) {
+					// 非常严重的异常
+					log.error("adam future system error occor:", t);
+					output.setResultMsg("adam future system error occor:" + AdamExceptionUtils.getStackTrace(t));
+				}
+			}
 			return;
 		}
 
@@ -252,6 +274,7 @@ public class ServiceChain {
 				absCallbacker.setChain(this, income, output);
 				return;
 			}
+
 		} catch (Throwable t) {
 			// 非常严重的异常
 			log.error("adam system error occor:", t);

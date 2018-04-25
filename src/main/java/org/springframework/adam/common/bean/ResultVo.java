@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
 import org.springframework.adam.common.bean.contants.BaseReslutCodeConstants;
 import org.springframework.adam.service.AbsTasker;
+import org.springframework.adam.service.AdamFuture;
 import org.springframework.adam.service.chain.ServiceChain;
 import org.springframework.beans.BeanUtils;
 
@@ -30,19 +31,21 @@ public class ResultVo<T> implements Serializable {
 	private transient List<AbsTasker> taskerList;
 
 	private transient int successCursor = 0;
-
+	
 	private String resultCode = "0"; // 返回代码
 
 	private String resultMsg = ""; // 返回信息
-	
+
 	private transient ServiceChain serviceChain;
 
 	private transient String latestServiceName = "";
-	
+
 	private transient AbsTasker nowTasker;
 
+	private transient AdamFuture future;
+
 	private T data;
-	
+
 	/**
 	 * copy resultVo
 	 * 
@@ -245,7 +248,7 @@ public class ResultVo<T> implements Serializable {
 	public int increaseServiceIndex() {
 		return ++serviceIndex;
 	}
-	
+
 	public int getNextServiceIndex() {
 		return serviceIndex;
 	}
@@ -290,5 +293,13 @@ public class ResultVo<T> implements Serializable {
 
 	public void setNowTasker(AbsTasker nowTasker) {
 		this.nowTasker = nowTasker;
+	}
+
+	public AdamFuture getFuture() {
+		return future;
+	}
+
+	public void setFuture(AdamFuture future) {
+		this.future = future;
 	}
 }

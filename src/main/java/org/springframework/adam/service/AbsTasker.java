@@ -98,7 +98,7 @@ public abstract class AbsTasker<T1, T2> {
 	 * @param isSetResultCode
 	 * @return
 	 */
-	protected AbsCallbacker excSyn(T1 income, ResultVo<T2> output, boolean isSetResultCode) {
+	protected AbsCallbacker exc(T1 income, ResultVo<T2> output, boolean isSetResultCode) {
 		String oldResultCode = output.getResultCode();
 		AbsCallbacker absCallbacker = null;
 		int retryTimes = this.serviceInfo.getFailRetryTimes();

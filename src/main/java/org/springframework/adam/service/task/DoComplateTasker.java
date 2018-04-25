@@ -36,7 +36,7 @@ public class DoComplateTasker<T1, T2> extends AbsTasker<T1, T2> {
 			if (null != this.serviceBefore && this.serviceBefore.dealServiceBefore(serviceInfo, income, output)) {
 				return null;
 			}
-			result = excSyn(income, output, false);
+			result = exc(income, output, false);
 		} catch (Throwable t) {
 			log.error(this.getServiceInfo().getSimpleClassName() + "." + TYPE + " error occor:", t);
 			output.setResultMsg("adam system error occor:" + AdamExceptionUtils.getStackTrace(t));

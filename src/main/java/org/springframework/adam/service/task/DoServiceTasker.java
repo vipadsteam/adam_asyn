@@ -36,7 +36,7 @@ public class DoServiceTasker<T1, T2> extends AbsTasker<T1, T2> {
 			if (null != this.serviceBefore && this.serviceBefore.dealServiceBefore(serviceInfo, income, output)) {
 				return null;
 			}
-			result = excSyn(income, output, true);
+			result = exc(income, output, true);
 		} catch (Throwable t) {
 			log.error(this.getServiceInfo().getSimpleClassName() + "." + TYPE + " error occor:", t);
 			// doservice的任务并且任务内部都是成功的才设置成框架的error
