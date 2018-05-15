@@ -5,6 +5,7 @@ package org.springframework.adam.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.springframework.adam.common.bean.AdamParamPair;
 import org.springframework.adam.common.bean.ResultVo;
@@ -28,6 +29,8 @@ public class AdamFuture {
 
 	List<AdamParamPair> pairList = new ArrayList<AdamParamPair>(size);
 
+	private CountDownLatch latch = new CountDownLatch(1);
+
 	public AdamFuture(int size) {
 		super();
 		this.size = size;
@@ -42,6 +45,14 @@ public class AdamFuture {
 		pairList.add(new AdamParamPair(income, output));
 	}
 
+	public void waitEnd() {
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("future error can not wait work end:", e);
+		}
+	}
+
 	public void work() {
 		workNext();
 	}
@@ -51,9 +62,11 @@ public class AdamFuture {
 	 */
 	public void workNext() {
 		if (null == serviceChain) {
+			latch.countDown();
 			return;
 		}
 		if (index >= pairList.size()) {
+			latch.countDown();
 			return;
 		}
 		AdamParamPair pair = pairList.get(index++);

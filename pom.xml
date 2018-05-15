@@ -271,4 +271,20 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<name>Search Book Replace Plugin</name>
+			<url>http://ads-server:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<!-- use the following if you ARE using a snapshot version. -->
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Search Book Replace Plugin</name>
+			<!-- <url>http://mvn1.tools.vipshop.com/nexus/content/repositories/snapshots/</url> -->
+			<url>http://ads-server:8081/nexus/content/repositories/snapshots/</url>
+			<!-- <url>http://nexus.tools.vip.com/nexus/content/repositories/snapshots/</url> -->
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
