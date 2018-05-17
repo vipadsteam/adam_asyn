@@ -3,7 +3,6 @@
  */
 package org.springframework.adam.common.aop;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -55,15 +54,11 @@ public class RpcServiceAspect {
 		Object[] args = pjp.getArgs();
 		Signature method = pjp.getSignature();
 
-		// 获取头信息
-		Map<String, String> headersMap = new HashMap<String, String>(1);
-		headersMap.put("header", "RPCServiceAspect");
-
 		// 新建request对象
 		RequestLogEntity requestLogEntity = null;
 		Object returnValue = null;
 
-		returnValue = doBefore(method.toString(), headersMap, args, returnValue);
+		returnValue = doBefore(method.toString(), null, args, returnValue);
 		String runningAccount = "";
 		if (logService.isNeedLog()) {
 			// init running account
@@ -71,7 +66,6 @@ public class RpcServiceAspect {
 			runningAccount = ThreadLocalHolder.getRunningAccount();
 		}
 		try {
-
 			// 看看是不是要日志
 			if (logService.isNeedLog()) {
 				// 获取参数
@@ -90,7 +84,7 @@ public class RpcServiceAspect {
 			if (returnValue == null) {
 				returnValue = pjp.proceed();
 			}
-			returnValue = doAfter(method.toString(), headersMap, args, returnValue);
+			returnValue = doAfter(method.toString(), null, args, returnValue);
 		} catch (Throwable t) {
 			long endTime = System.currentTimeMillis();
 			logger.error("RA:" + runningAccount + " " + "Method [" + method.toString() + "] " + AdamSysConstants.LINE_SEPARATOR + "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:" + (endTime - beginTime) + t, t);

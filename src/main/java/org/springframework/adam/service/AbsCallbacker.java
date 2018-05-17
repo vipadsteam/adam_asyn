@@ -7,6 +7,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.adam.common.bean.ResultVo;
+import org.springframework.adam.common.bean.ThreadHolder;
+import org.springframework.adam.common.utils.ThreadLocalHolder;
 import org.springframework.adam.service.chain.ServiceChain;
 
 /**
@@ -62,9 +64,19 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 */
 	protected long motherThreadId;
 
+	/**
+	 * 线程专用
+	 */
+	protected ThreadHolder threadHolder = new ThreadHolder();
+
 	public AbsCallbacker(long motherThreadId) {
 		super();
 		this.motherThreadId = motherThreadId;
+		setThreadHolder(ThreadLocalHolder.getThreadHolder());
+	}
+
+	public void setThreadHolder(ThreadHolder threadHolder) {
+		this.threadHolder.copy(threadHolder);
 	}
 
 	/**
@@ -122,6 +134,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	}
 
 	private void doit(ResultType result, ErrorType e, int type) {
+		ThreadLocalHolder.setThreadHolder(threadHolder);
 		try {
 			loopWaitChain();
 			switch (type) {
