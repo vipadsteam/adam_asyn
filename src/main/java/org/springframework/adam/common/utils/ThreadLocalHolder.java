@@ -59,6 +59,9 @@ public class ThreadLocalHolder {
 	}
 
 	public static ThreadHolder getThreadHolder() {
+		if (null == contextHolder.get()) {
+			initRunningAccount();
+		}
 		return contextHolder.get();
 	}
 
