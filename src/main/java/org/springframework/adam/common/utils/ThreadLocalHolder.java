@@ -14,11 +14,11 @@ public class ThreadLocalHolder {
 	private static ThreadLocal<ThreadHolder> contextHolder = new ThreadLocal<ThreadHolder>(); // 线程本地环境
 
 	public static void initRunningAccount() {
-		if (null == contextHolder.get()) {
-			ThreadHolder th = new ThreadHolder();
+		ThreadHolder th = contextHolder.get();
+		if (null == th) {
+			th = new ThreadHolder();
 			contextHolder.set(th);
 		}
-		ThreadHolder th = contextHolder.get();
 		String runningAccountId = AdamUUIDUtils.getUUID();
 		th.setRunningAccountId(runningAccountId);
 	}
