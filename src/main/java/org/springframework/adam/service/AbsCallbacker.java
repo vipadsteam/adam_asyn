@@ -5,6 +5,7 @@ package org.springframework.adam.service;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.ThreadHolder;
@@ -40,9 +41,19 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	protected volatile boolean isDone = false;
 
 	/**
-	 * 是否已经切换过线程
+	 * 是否已经切换过线程,因为success或fail已经切换过线程的情况下，complete就没必要再切换一次
 	 */
 	protected volatile boolean isSwitched = false;
+
+	/**
+	 * 如果是fastReturn，则只要有一个callback回调就进行下一步操作，如果为false则全部callback回来再下一步操作
+	 */
+	protected boolean fastReturn = false;
+
+	/**
+	 * 如果fastReturn模式，isDoneFirst表示是否已经有第一个callback已经完成了
+	 */
+	protected AtomicBoolean isDoneFirst;
 
 	/**
 	 * 切换的线程池
@@ -176,8 +187,14 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	private void workNext() {
 		// 如果有combiner则由combiner去完成后面步骤
 		if (null != this.combiner) {
-			this.combiner.onComplete(null, null);
-			return;
+			// 如果是非fastReturn模式，或者是fastReturn模式且第一次的就继续做了
+			if (!fastReturn || isDoneFirst.compareAndSet(false, true)) {
+				this.combiner.onComplete(null, null);
+				return;
+			} else {
+				// 是fastReturn模式，已经不是第一次完成则不继续做了
+				return;
+			}
 		}
 
 		// 没有combiner则自己完成
