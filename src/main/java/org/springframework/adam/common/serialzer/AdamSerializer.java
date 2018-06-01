@@ -5,6 +5,10 @@ package org.springframework.adam.common.serialzer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -20,20 +24,24 @@ public class AdamSerializer {
 
 	private static AdamSerializer adamKryoPool;
 
-	private KryoPool pool;
+	private static final int LIST_SIZE = 32;
+
+	private List<KryoPool> poolList = new ArrayList<KryoPool>(LIST_SIZE);
+
+	private volatile int index = 0;
 
 	private AdamSerializer() {
 	}
 
 	public static AdamSerializer instance() {
-		if (null == adamKryoPool || null == adamKryoPool.pool) {
+		if (null == adamKryoPool || CollectionUtils.isEmpty(adamKryoPool.poolList)) {
 			init(null);
 		}
 		return adamKryoPool;
 	}
 
 	public static AdamSerializer instance(KryoFactory factory) {
-		if (null == adamKryoPool || null == adamKryoPool.pool) {
+		if (null == adamKryoPool || CollectionUtils.isEmpty(adamKryoPool.poolList)) {
 			init(factory);
 		}
 		return adamKryoPool;
@@ -44,15 +52,18 @@ public class AdamSerializer {
 			adamKryoPool = new AdamSerializer();
 		}
 
-		if (null == adamKryoPool.pool) {
+		if (CollectionUtils.isEmpty(adamKryoPool.poolList)) {
 			if (null == factory) {
 				factory = new AdamSerializeFactory();
 			}
-			adamKryoPool.pool = new KryoPool.Builder(factory).build();
+			for (int i = 0; i < LIST_SIZE; i++) {
+				adamKryoPool.poolList.add(new KryoPool.Builder(factory).build());
+			}
 		}
 	}
 
 	public byte[] serialize(Object obj) throws IOException {
+		KryoPool pool = getPool();
 		Kryo kryo = pool.borrow();
 		byte[] b = null;
 		try {
@@ -71,6 +82,7 @@ public class AdamSerializer {
 	}
 
 	public <T> T deserialize(byte[] b, Class<T> clazz) {
+		KryoPool pool = getPool();
 		Input input = new Input(b);
 		input.close();
 		T result = null;
@@ -81,5 +93,18 @@ public class AdamSerializer {
 			pool.release(kryo);
 		}
 		return result;
+	}
+
+	private KryoPool getPool() {
+		int nowIndex = index++;
+		if (nowIndex > 100000000) {
+			index = 0;
+		}
+		int i = nowIndex % LIST_SIZE;
+		KryoPool pool = adamKryoPool.poolList.get(i);
+		if (null == pool) {
+			pool = adamKryoPool.poolList.get(0);
+		}
+		return pool;
 	}
 }
