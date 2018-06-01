@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.pool.KryoFactory;
@@ -27,14 +26,14 @@ public class AdamSerializer {
 	}
 
 	public static AdamSerializer instance() {
-		if (null == adamKryoPool) {
+		if (null == adamKryoPool || null == adamKryoPool.pool) {
 			init(null);
 		}
 		return adamKryoPool;
 	}
 
 	public static AdamSerializer instance(KryoFactory factory) {
-		if (null == adamKryoPool) {
+		if (null == adamKryoPool || null == adamKryoPool.pool) {
 			init(factory);
 		}
 		return adamKryoPool;
@@ -43,6 +42,9 @@ public class AdamSerializer {
 	private synchronized static void init(KryoFactory factory) {
 		if (null == adamKryoPool) {
 			adamKryoPool = new AdamSerializer();
+		}
+
+		if (null == adamKryoPool.pool) {
 			if (null == factory) {
 				factory = new AdamSerializeFactory();
 			}
@@ -51,22 +53,33 @@ public class AdamSerializer {
 	}
 
 	public byte[] serialize(Object obj) throws IOException {
-		Kryo kryo = adamKryoPool.pool.borrow();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		Output output = new Output(baos);
-		kryo.writeObject(output, obj);
-		output.flush();
-		output.close();
-		byte[] b = baos.toByteArray();
-		baos.flush();
-		baos.close();
+		Kryo kryo = pool.borrow();
+		byte[] b = null;
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Output output = new Output(baos);
+			kryo.writeObject(output, obj);
+			output.flush();
+			output.close();
+			b = baos.toByteArray();
+			baos.flush();
+			baos.close();
+		} finally {
+			pool.release(kryo);
+		}
 		return b;
 	}
 
 	public <T> T deserialize(byte[] b, Class<T> clazz) {
 		Input input = new Input(b);
 		input.close();
+		T result = null;
 		Kryo kryo = pool.borrow();
-		return kryo.readObject(input, clazz);
+		try {
+			result = kryo.readObject(input, clazz);
+		} finally {
+			pool.release(kryo);
+		}
+		return result;
 	}
 }
