@@ -16,7 +16,7 @@ import org.springframework.adam.service.IService;
 public class ServiceInfo<T1, T2> {
 
 	private IService<T1, T2> service;
-	
+
 	private String simpleClassName;
 
 	private String className;
@@ -41,23 +41,27 @@ public class ServiceInfo<T1, T2> {
 		Class clazz = AdamClassUtils.getTargetClass(service);
 		simpleClassName = clazz.getSimpleName();
 		className = clazz.getName();
-		ServiceOrder order = (ServiceOrder) clazz.getAnnotation(ServiceOrder.class);
-		this.order = order.value();
-		ServiceErrorCode errorCode = (ServiceErrorCode) clazz.getAnnotation(ServiceErrorCode.class);
-		this.errorCode = errorCode.value();
-		ServiceFailRetryTimes failRetryTimes = (ServiceFailRetryTimes) clazz.getAnnotation(ServiceFailRetryTimes.class);
-		if (null != failRetryTimes) {
-			this.serverRetryTimes = failRetryTimes.server();
-			this.successRetryTimes = failRetryTimes.success();
-			this.failRetryTimes = failRetryTimes.fail();
-			this.complateRetryTimes = failRetryTimes.complate();
-			this.isLog = failRetryTimes.log();
-		} else {
-			this.serverRetryTimes = 1;
-			this.successRetryTimes = 1;
-			this.failRetryTimes = 1;
-			this.complateRetryTimes = 1;
-			this.isLog = true;
+		try {
+			ServiceOrder order = (ServiceOrder) clazz.getAnnotation(ServiceOrder.class);
+			this.order = order.value();
+			ServiceErrorCode errorCode = (ServiceErrorCode) clazz.getAnnotation(ServiceErrorCode.class);
+			this.errorCode = errorCode.value();
+			ServiceFailRetryTimes failRetryTimes = (ServiceFailRetryTimes) clazz.getAnnotation(ServiceFailRetryTimes.class);
+			if (null != failRetryTimes) {
+				this.serverRetryTimes = failRetryTimes.server();
+				this.successRetryTimes = failRetryTimes.success();
+				this.failRetryTimes = failRetryTimes.fail();
+				this.complateRetryTimes = failRetryTimes.complate();
+				this.isLog = failRetryTimes.log();
+			} else {
+				this.serverRetryTimes = 1;
+				this.successRetryTimes = 1;
+				this.failRetryTimes = 1;
+				this.complateRetryTimes = 1;
+				this.isLog = true;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(className + " error:", e);
 		}
 	}
 
