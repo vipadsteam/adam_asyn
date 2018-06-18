@@ -112,4 +112,12 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 		// nothing to do
 	}
 
+	public List<AbsCallbacker> getCallbacks() {
+		return callbacks;
+	}
+
+	public void setCallbacks(List<AbsCallbacker> callbacks) {
+		this.callbacks = callbacks;
+	}
+
 }

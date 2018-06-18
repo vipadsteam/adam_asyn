@@ -27,6 +27,7 @@ import org.springframework.adam.common.utils.context.SpringContextUtils;
 import org.springframework.adam.service.AbsCallbacker;
 import org.springframework.adam.service.AbsTasker;
 import org.springframework.adam.service.AdamFuture;
+import org.springframework.adam.service.CallbackCombiner;
 import org.springframework.adam.service.IService;
 import org.springframework.adam.service.IServiceBefore;
 import org.springframework.adam.service.task.DoComplateTasker;
@@ -269,6 +270,16 @@ public class ServiceChain {
 			if (null == absCallbacker) {
 				doTask(income, output);
 				return;
+			} else if (absCallbacker instanceof CallbackCombiner) {// 如果是combine，callback都为空情况下也和null一样处理
+				CallbackCombiner combiner = (CallbackCombiner) absCallbacker;
+				if (CollectionUtils.isEmpty(combiner.getCallbacks())) {
+					doTask(income, output);
+					return;
+				} else {
+					// 把东西都设置好，让callback来完成后面的工作
+					absCallbacker.setChain(this, income, output);
+					return;
+				}
 			} else {
 				// 把东西都设置好，让callback来完成后面的工作
 				absCallbacker.setChain(this, income, output);

@@ -86,9 +86,13 @@ public abstract class AbsTasker<T1, T2> {
 		if (!serviceInfo.isLog()) {
 			return;
 		}
-		
+
 		String methodName = serviceInfo.getSimpleClassName() + "." + this.type;
-		logService.sendRunningAccountLog(income, output, methodName, remark, beginTime);
+		try {
+			logService.sendRunningAccountLog(income, output, methodName, remark, beginTime);
+		} catch (Exception e) {
+			log.error("logService error", e);
+		}
 	}
 
 	/**
@@ -106,13 +110,13 @@ public abstract class AbsTasker<T1, T2> {
 			long begin = System.currentTimeMillis();
 			addBeginLog(income, output);
 			try {
-				if(DoServiceTasker.TYPE.equals(this.type)){
+				if (DoServiceTasker.TYPE.equals(this.type)) {
 					absCallbacker = serviceInfo.getService().doService(income, output);
-				}else if(DoSuccessTasker.TYPE.equals(this.type)){
+				} else if (DoSuccessTasker.TYPE.equals(this.type)) {
 					absCallbacker = serviceInfo.getService().doSuccess(income, output);
-				}else if(DoFailTasker.TYPE.equals(this.type)){
+				} else if (DoFailTasker.TYPE.equals(this.type)) {
 					absCallbacker = serviceInfo.getService().doFail(income, output);
-				}else if(DoComplateTasker.TYPE.equals(this.type)){
+				} else if (DoComplateTasker.TYPE.equals(this.type)) {
 					absCallbacker = serviceInfo.getService().doComplate(income, output);
 				}
 				addEndLog(income, output, begin);

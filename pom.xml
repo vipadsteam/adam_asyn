@@ -281,8 +281,8 @@
 		<snapshotRepository>
 			<id>snapshots</id>
 			<name>Search Book Replace Plugin</name>
-			<!-- <url>http://mvn1.tools.vipshop.com/nexus/content/repositories/snapshots/</url> -->
-			<url>http://ads-server:8081/nexus/content/repositories/snapshots/</url>
+			<url>http://mvn1.tools.vipshop.com/nexus/content/repositories/snapshots/</url>
+			<!-- <url>http://ads-server:8081/nexus/content/repositories/snapshots/</url> -->
 			<!-- <url>http://nexus.tools.vip.com/nexus/content/repositories/snapshots/</url> -->
 		</snapshotRepository>
 	</distributionManagement>
