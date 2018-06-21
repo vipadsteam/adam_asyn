@@ -51,7 +51,7 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 		if (null == callback) {
 			return;
 		}
-		if (callback.isCombiner) {
+		if (callback.isCombiner()) {
 			throw new RuntimeException("combiner can not combine a combiner");
 		}
 		callback.setCombiner(this);
