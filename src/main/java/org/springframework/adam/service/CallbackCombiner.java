@@ -21,24 +21,28 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 
 	public CallbackCombiner() {
 		super(Thread.currentThread().getId());
+		this.isCombiner = true;
 	}
 
 	public CallbackCombiner(boolean fastReturn) {
 		super(Thread.currentThread().getId());
 		this.fastReturn = fastReturn;
+		this.isCombiner = true;
 	}
 
 	public CallbackCombiner(ThreadPoolExecutor tpe) {
 		super(Thread.currentThread().getId());
 		this.tpe = tpe;
+		this.isCombiner = true;
 	}
 
 	public CallbackCombiner(ThreadPoolExecutor tpe, boolean fastReturn) {
 		super(Thread.currentThread().getId());
 		this.tpe = tpe;
+		this.isCombiner = true;
 		this.fastReturn = fastReturn;
 		// 是fastReturn模式则初始化isDoneFirst
-		if(fastReturn){
+		if (fastReturn) {
 			this.isDoneFirst = new AtomicBoolean(false);
 		}
 	}
@@ -46,6 +50,9 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 	public void combine(AbsCallbacker<Object, Throwable, IncomeType, OutputType> callback) {
 		if (null == callback) {
 			return;
+		}
+		if (callback.isCombiner) {
+			throw new RuntimeException("combiner can not combine a combiner");
 		}
 		callback.setCombiner(this);
 		this.callbacks.add(callback);

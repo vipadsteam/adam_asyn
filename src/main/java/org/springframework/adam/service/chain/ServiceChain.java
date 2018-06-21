@@ -270,7 +270,7 @@ public class ServiceChain {
 			if (null == absCallbacker) {
 				doTask(income, output);
 				return;
-			} else if (absCallbacker instanceof CallbackCombiner) {// 如果是combine，callback都为空情况下也和null一样处理
+			} else if (absCallbacker.isCombiner()) {// 如果是combine，callback都为空情况下也和null一样处理
 				CallbackCombiner combiner = (CallbackCombiner) absCallbacker;
 				if (CollectionUtils.isEmpty(combiner.getCallbacks())) {
 					doTask(income, output);

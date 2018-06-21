@@ -17,6 +17,8 @@ import org.springframework.adam.service.chain.ServiceChain;
  *
  */
 public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, IncomeType, OutputType> {
+	
+	protected boolean isCombiner = false;
 
 	protected final static int SUCC_METHOD = 0;
 
@@ -248,6 +250,10 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 
 	public void setCombiner(CallbackCombiner combiner) {
 		this.combiner = combiner;
+	}
+
+	public boolean isCombiner() {
+		return isCombiner;
 	}
 
 }
