@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -27,6 +28,10 @@ public class AdamSerializer {
 	private static final int LIST_SIZE = 32;
 
 	private List<KryoPool> poolList = new ArrayList<KryoPool>(LIST_SIZE);
+
+	private AtomicBoolean isInited = new AtomicBoolean(false);
+
+	private boolean myInited = false;
 
 	private volatile int index = 0;
 
@@ -60,6 +65,7 @@ public class AdamSerializer {
 				adamKryoPool.poolList.add(new KryoPool.Builder(factory).build());
 			}
 		}
+		adamKryoPool.isInited.set(true);
 	}
 
 	public byte[] serialize(Object obj) throws IOException {
@@ -101,6 +107,24 @@ public class AdamSerializer {
 			index = 0;
 		}
 		int i = nowIndex % LIST_SIZE;
+
+		// 当前线程是否init了，如果否则等待初始化
+		if (!myInited) {
+			// 循环10s，看看是否init了，如果还没那就也继续了
+			for (int fi = 0; fi < 1000; fi++) {
+				if (!adamKryoPool.isInited.get()) {
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						// nothing to do
+					}
+				} else {
+					break;
+				}
+			}
+			myInited = true;
+		}
+
 		KryoPool pool = adamKryoPool.poolList.get(i);
 		if (null == pool) {
 			pool = adamKryoPool.poolList.get(0);
