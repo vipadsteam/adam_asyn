@@ -13,6 +13,9 @@ import java.io.StringWriter;
 public class AdamExceptionUtils {
 
 	public static String getStackTrace(Throwable t) {
+		if (null == t) {
+			return null;
+		}
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		t.printStackTrace(pw);
