@@ -180,7 +180,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	}
 
 	public void onComplete(ResultType result, ErrorType e) {
-		onDoIt(null, e, COMPL_METHOD);
+		onDoIt(result, e, COMPL_METHOD);
 	}
 
 	/**
