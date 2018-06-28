@@ -129,6 +129,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 * @param type
 	 */
 	protected void onDoIt(ResultType result, ErrorType e, int type) {
+		ThreadLocalHolder.setThreadHolder(threadHolder);
 		if (null == this.tpe || true == this.isSwitched) {
 			doit(result, e, type);
 		} else {
@@ -137,6 +138,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 				this.tpe.execute(new Runnable() {
 					@Override
 					public void run() {
+						ThreadLocalHolder.setThreadHolder(threadHolder);
 						doit(result, e, type);
 					}
 				});
@@ -147,7 +149,6 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	}
 
 	private void doit(ResultType result, ErrorType e, int type) {
-		ThreadLocalHolder.setThreadHolder(threadHolder);
 		try {
 			loopWaitChain();
 			switch (type) {
