@@ -50,7 +50,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * 如果是fastReturn，则只要有一个callback回调就进行下一步操作，如果为false则全部callback回来再下一步操作
 	 */
-	protected boolean fastReturn = false;
+	protected volatile boolean fastReturn = false;
 
 	/**
 	 * 如果fastReturn模式，isDoneFirst表示是否已经有第一个callback已经完成了
