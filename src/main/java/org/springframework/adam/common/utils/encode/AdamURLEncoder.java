@@ -24,4 +24,8 @@ public class AdamURLEncoder {
 			return URLEncoder.encode(text, "utf-8");
 		}
 	}
+	
+	public static void main(String[] args) throws Exception {
+		System.out.println(encode("www asdf", true));
+	}
 }

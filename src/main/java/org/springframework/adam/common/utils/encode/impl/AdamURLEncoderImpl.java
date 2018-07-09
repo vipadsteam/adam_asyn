@@ -46,8 +46,8 @@ public class AdamURLEncoderImpl extends ByteToCharEncoder<AdamURLEncoderImpl> {
 		UNRESERVED.set('_');
 		UNRESERVED.set('.');
 		UNRESERVED.set('*');
-		// Will be replaced with '+'.
-		UNRESERVED.set(' ');
+		// Will be replaced with '+'. // to %20
+		// UNRESERVED.set(' ');
 	}
 
 	public AdamURLEncoderImpl() {
@@ -65,9 +65,6 @@ public class AdamURLEncoderImpl extends ByteToCharEncoder<AdamURLEncoderImpl> {
 
 			int b = in.get() & 0xFF;
 			if (UNRESERVED.get(b)) {
-				if (b == ' ') {
-					b = '+';
-				}
 				out.put((char) b);
 			} else {
 				out.put('%');
