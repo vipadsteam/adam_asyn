@@ -29,14 +29,20 @@ public class ThreeTuple<A, B, C> extends TwoTuple<A, B> {
 	}
 
 	@Override
-	public Object get(int i){
+	public Object get(int i) {
 		Object result = super.get(i);
-		if(null != result){
+		if (null != result) {
 			return result;
 		}
-		if(i == 3){
+		if (i == 3) {
 			return c;
 		}
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "ThreeTuple [c=" + c + ", b=" + b + ", a=" + a + "]";
+	}
+
 }

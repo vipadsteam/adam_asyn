@@ -40,4 +40,10 @@ public class OneTuple<A> {
 		Object result = this.get(i);
 		return (T) result;
 	}
+
+	@Override
+	public String toString() {
+		return "OneTuple [a=" + a + "]";
+	}
+
 }

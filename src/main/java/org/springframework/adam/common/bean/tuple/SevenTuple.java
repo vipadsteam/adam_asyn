@@ -39,4 +39,10 @@ public class SevenTuple<A, B, C, D, E, F, G> extends SixTuple<A, B, C, D, E, F> 
 		}
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "SevenTuple [g=" + g + ", f=" + f + ", e=" + e + ", d=" + d + ", c=" + c + ", b=" + b + ", a=" + a + "]";
+	}
+
 }

@@ -39,4 +39,10 @@ public class EightTuple<A, B, C, D, E, F, G, H> extends SevenTuple<A, B, C, D, E
 		}
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "EightTuple [h=" + h + ", g=" + g + ", f=" + f + ", e=" + e + ", d=" + d + ", c=" + c + ", b=" + b + ", a=" + a + "]";
+	}
+
 }
