@@ -5,7 +5,7 @@ package org.springframework.adam.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.adam.common.bean.ResultVo;
@@ -30,13 +30,13 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 		this.isCombiner = true;
 	}
 
-	public CallbackCombiner(ThreadPoolExecutor tpe) {
+	public CallbackCombiner(Executor tpe) {
 		super(Thread.currentThread().getId());
 		this.tpe = tpe;
 		this.isCombiner = true;
 	}
 
-	public CallbackCombiner(ThreadPoolExecutor tpe, boolean fastReturn) {
+	public CallbackCombiner(Executor tpe, boolean fastReturn) {
 		super(Thread.currentThread().getId());
 		this.tpe = tpe;
 		this.isCombiner = true;

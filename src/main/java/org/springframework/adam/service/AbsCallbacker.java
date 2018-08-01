@@ -4,7 +4,7 @@
 package org.springframework.adam.service;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.adam.common.bean.ResultVo;
@@ -60,7 +60,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * 切换的线程池
 	 */
-	protected ThreadPoolExecutor tpe;
+	protected Executor tpe;
 
 	/**
 	 * call back合并器
@@ -207,7 +207,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 		serviceChain.doTask(income, output);
 	}
 
-	public void setThreadPoolExcutor(ThreadPoolExecutor tpe) {
+	public void setExcutor(Executor tpe) {
 		this.tpe = tpe;
 	}
 
