@@ -27,7 +27,7 @@ public class AdamFuture {
 
 	private ResultVo lastOutput;
 
-	List<AdamParamPair> pairList = new ArrayList<AdamParamPair>(size);
+	List<AdamParamPair> pairList = new ArrayList<AdamParamPair>();
 
 	private CountDownLatch latch = new CountDownLatch(1);
 
