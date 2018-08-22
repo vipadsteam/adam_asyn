@@ -45,4 +45,44 @@ public class ThreeTuple<A, B, C> extends TwoTuple<A, B> {
 		return "ThreeTuple [c=" + c + ", b=" + b + ", a=" + a + "]";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((c == null) ? 0 : c.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof ThreeTuple)) {
+			return false;
+		}
+		ThreeTuple other = (ThreeTuple) obj;
+		if (c == null) {
+			if (other.c != null) {
+				return false;
+			}
+		} else if (!c.equals(other.c)) {
+			return false;
+		}
+		return true;
+	}
+
 }

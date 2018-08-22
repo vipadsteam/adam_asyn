@@ -45,4 +45,44 @@ public class SixTuple<A, B, C, D, E, F> extends FiveTuple<A, B, C, D, E> {
 		return "SixTuple [f=" + f + ", e=" + e + ", d=" + d + ", c=" + c + ", b=" + b + ", a=" + a + "]";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((f == null) ? 0 : f.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof SixTuple)) {
+			return false;
+		}
+		SixTuple other = (SixTuple) obj;
+		if (f == null) {
+			if (other.f != null) {
+				return false;
+			}
+		} else if (!f.equals(other.f)) {
+			return false;
+		}
+		return true;
+	}
+
 }

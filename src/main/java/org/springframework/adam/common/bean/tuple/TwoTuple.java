@@ -45,4 +45,44 @@ public class TwoTuple<A, B> extends OneTuple<A> {
 		return "TwoTuple [b=" + b + ", a=" + a + "]";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((b == null) ? 0 : b.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof TwoTuple)) {
+			return false;
+		}
+		TwoTuple other = (TwoTuple) obj;
+		if (b == null) {
+			if (other.b != null) {
+				return false;
+			}
+		} else if (!b.equals(other.b)) {
+			return false;
+		}
+		return true;
+	}
+
 }

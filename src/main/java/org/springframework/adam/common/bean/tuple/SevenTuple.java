@@ -45,4 +45,44 @@ public class SevenTuple<A, B, C, D, E, F, G> extends SixTuple<A, B, C, D, E, F> 
 		return "SevenTuple [g=" + g + ", f=" + f + ", e=" + e + ", d=" + d + ", c=" + c + ", b=" + b + ", a=" + a + "]";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((g == null) ? 0 : g.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof SevenTuple)) {
+			return false;
+		}
+		SevenTuple other = (SevenTuple) obj;
+		if (g == null) {
+			if (other.g != null) {
+				return false;
+			}
+		} else if (!g.equals(other.g)) {
+			return false;
+		}
+		return true;
+	}
+
 }
