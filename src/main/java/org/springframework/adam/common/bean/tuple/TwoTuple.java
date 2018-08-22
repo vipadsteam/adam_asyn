@@ -9,6 +9,11 @@ package org.springframework.adam.common.bean.tuple;
  */
 public class TwoTuple<A, B> extends OneTuple<A> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2923295655560763953L;
+
 	protected B b;
 
 	public TwoTuple() {

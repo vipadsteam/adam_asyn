@@ -7,7 +7,12 @@ package org.springframework.adam.common.bean.tuple;
  * @author USER
  *
  */
-public class OneTuple<A> {
+public class OneTuple<A> implements java.io.Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5520500315395275219L;
 
 	protected A a;
 

@@ -9,6 +9,11 @@ package org.springframework.adam.common.bean.tuple;
  */
 public class SixTuple<A, B, C, D, E, F> extends FiveTuple<A, B, C, D, E> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6939309843691971397L;
+
 	protected F f;
 
 	public SixTuple() {

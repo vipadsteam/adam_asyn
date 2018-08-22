@@ -9,6 +9,11 @@ package org.springframework.adam.common.bean.tuple;
  */
 public class EightTuple<A, B, C, D, E, F, G, H> extends SevenTuple<A, B, C, D, E, F, G> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6857777821122824818L;
+
 	protected H h;
 
 	public EightTuple() {
