@@ -21,7 +21,7 @@ public class LocalIpHolder {
 
 	private static final Log log = LogFactory.getLog(LocalIpHolder.class);
 
-	private static String localIp = null;
+	private volatile static String localIp = null;
 
 	public static String getIp() {
 		if (StringUtils.isBlank(localIp)) {

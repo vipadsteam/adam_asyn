@@ -5,6 +5,7 @@ package org.springframework.adam.lock;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.springframework.adam.common.utils.holder.LocalIpHolder;
 import org.springframework.adam.lock.cache.CacheHelper;
 import org.springframework.adam.lock.cache.exception.CacheLockedException;
 
@@ -40,7 +41,7 @@ public class CacheLock {
 	}
 
 	public boolean getLock(Long expireSeconds) {
-		if (cacheHelper.setnx(this.key, "TRUE", expireSeconds)) {
+		if (cacheHelper.setnx(this.key, LocalIpHolder.getIp(), expireSeconds)) {
 			return true;
 		}
 		return false;
@@ -52,7 +53,7 @@ public class CacheLock {
 		long milliseconds = System.currentTimeMillis();
 		try {
 			while (System.currentTimeMillis() - milliseconds < timeout) {
-				if (cacheHelper.setnx(this.key, "TRUE", expire)) {
+				if (cacheHelper.setnx(this.key, LocalIpHolder.getIp(), expire)) {
 					return true;
 				}
 				justWait(waitTime);
