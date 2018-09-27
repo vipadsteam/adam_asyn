@@ -25,7 +25,7 @@ public class AdamSerializer {
 
 	private static AdamSerializer adamKryoPool;
 
-	private static final int LIST_SIZE = 32;
+	private static final int LIST_SIZE = 16;
 
 	private List<KryoPool> poolList = new ArrayList<KryoPool>(LIST_SIZE);
 
