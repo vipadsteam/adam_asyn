@@ -65,7 +65,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * call back合并器
 	 */
-	protected CallbackCombiner<IncomeType, OutputType> combiner;
+	protected volatile CallbackCombiner<IncomeType, OutputType> combiner;
 
 	/**
 	 * 防止后面步骤还没走完，servicechain和income还有output还没注入进来就跑掉了

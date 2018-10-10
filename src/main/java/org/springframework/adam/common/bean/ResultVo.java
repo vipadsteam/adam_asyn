@@ -13,6 +13,7 @@ import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
 import org.springframework.adam.common.bean.contants.BaseReslutCodeConstants;
 import org.springframework.adam.service.AbsTasker;
 import org.springframework.adam.service.AdamFuture;
+import org.springframework.adam.service.callback.ServiceChainCallbacker;
 import org.springframework.adam.service.chain.ServiceChain;
 import org.springframework.beans.BeanUtils;
 
@@ -31,7 +32,7 @@ public class ResultVo<T> implements Serializable {
 	private transient List<AbsTasker> taskerList;
 
 	private transient int successCursor = 0;
-	
+
 	private String resultCode = "0"; // 返回代码
 
 	private String resultMsg = ""; // 返回信息
@@ -43,6 +44,8 @@ public class ResultVo<T> implements Serializable {
 	private transient AbsTasker nowTasker;
 
 	private transient AdamFuture future;
+	
+	private transient ServiceChainCallbacker scc;
 
 	private T data;
 
@@ -267,7 +270,9 @@ public class ResultVo<T> implements Serializable {
 
 	public void setTaskerList(List<AbsTasker> taskerList) {
 		// 初始化successCursor
-		this.successCursor = taskerList.get(0).getServiceInfo().getOrder();
+		if (null != taskerList.get(0).getServiceInfo()) {
+			this.successCursor = taskerList.get(0).getServiceInfo().getOrder();
+		}
 		this.taskerList = taskerList;
 	}
 
@@ -301,5 +306,19 @@ public class ResultVo<T> implements Serializable {
 
 	public void setFuture(AdamFuture future) {
 		this.future = future;
+	}
+
+	/**
+	 * @return the scc
+	 */
+	public ServiceChainCallbacker getScc() {
+		return scc;
+	}
+
+	/**
+	 * @param scc the scc to set
+	 */
+	public void setScc(ServiceChainCallbacker scc) {
+		this.scc = scc;
 	}
 }

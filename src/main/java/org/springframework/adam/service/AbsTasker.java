@@ -10,6 +10,7 @@ import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.ServiceInfo;
 import org.springframework.adam.common.bean.contants.BaseReslutCodeConstants;
 import org.springframework.adam.common.utils.AdamExceptionUtils;
+import org.springframework.adam.service.callback.ServiceChainCallbacker;
 import org.springframework.adam.service.task.DoComplateTasker;
 import org.springframework.adam.service.task.DoFailTasker;
 import org.springframework.adam.service.task.DoServiceTasker;
@@ -33,7 +34,11 @@ public abstract class AbsTasker<T1, T2> {
 
 	public AbsTasker(IService<T1, T2> service, ILogService logService, IServiceBefore<T1, T2> serviceBefore, String type) {
 		super();
-		this.serviceInfo = new ServiceInfo<T1, T2>(service);
+		if (null != service) {
+			this.serviceInfo = new ServiceInfo<T1, T2>(service);
+		} else {
+			this.serviceInfo = null;
+		}
 		this.logService = logService;
 		this.serviceBefore = serviceBefore;
 		this.type = type;
@@ -83,6 +88,10 @@ public abstract class AbsTasker<T1, T2> {
 			return;
 		}
 
+		if (null == serviceInfo) {
+			return;
+		}
+
 		if (!serviceInfo.isLog()) {
 			return;
 		}
@@ -105,6 +114,10 @@ public abstract class AbsTasker<T1, T2> {
 	protected AbsCallbacker exc(T1 income, ResultVo<T2> output, boolean isSetResultCode) {
 		String oldResultCode = output.getResultCode();
 		AbsCallbacker absCallbacker = null;
+		// 如果为空则说明只有一种情况就是DoFinalTask的,但是也不会走到这里的
+		if(null == this.serviceInfo){
+			return null;
+		}
 		int retryTimes = this.serviceInfo.getFailRetryTimes();
 		for (int retryTimeindex = 0; retryTimeindex < retryTimes; retryTimeindex++) {
 			long begin = System.currentTimeMillis();

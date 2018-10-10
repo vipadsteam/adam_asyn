@@ -30,8 +30,10 @@ import org.springframework.adam.service.AdamFuture;
 import org.springframework.adam.service.CallbackCombiner;
 import org.springframework.adam.service.IService;
 import org.springframework.adam.service.IServiceBefore;
+import org.springframework.adam.service.callback.ServiceChainCallbacker;
 import org.springframework.adam.service.task.DoComplateTasker;
 import org.springframework.adam.service.task.DoFailTasker;
+import org.springframework.adam.service.task.DoFinalTasker;
 import org.springframework.adam.service.task.DoServiceTasker;
 import org.springframework.adam.service.task.DoSuccessTasker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +126,8 @@ public class ServiceChain {
 				taskList.add(new DoFailTasker(service, logService, serviceBefore));
 				taskList.add(new DoComplateTasker(service, logService, serviceBefore));
 			}
+			// 加入个FinalTask
+			taskList.add(new DoFinalTasker(logService));
 		}
 
 		isReady.set(true);
@@ -175,7 +179,7 @@ public class ServiceChain {
 	 * @param serviceEnum
 	 * @return
 	 */
-	public void doServer(Object income, ResultVo output, String serviceEnum) {
+	public ServiceChainCallbacker doServer(Object income, ResultVo output, String serviceEnum) {
 		// 检查初始化
 		init();
 		// 获取任务列表
@@ -186,21 +190,27 @@ public class ServiceChain {
 			log.error(msg);
 			output.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_900001);
 			output.setResultMsg(msg);
-			return;
+			return null;
 		}
 
 		// 塞任务队列进output对象
 		output.setTaskerList(taskList);
 		// 塞进serviceChain
 		output.setServiceChain(this);
+		
+		ServiceChainCallbacker scc = new ServiceChainCallbacker();
+		output.setScc(scc);
+		scc.setChain(this, income, output);
 		// 获取future
 		AdamFuture future = output.getFuture();
 		// 正式处理任务
 		if (null == future) {
 			doTask(income, output);
+			return scc;
 		} else {
 			// 如果future不为空则表明链条聚合
 			future.init(this, income, output);
+			return scc;
 		}
 	}
 
@@ -243,13 +253,15 @@ public class ServiceChain {
 		// dotask
 		try {
 			AbsCallbacker absCallbacker = null;
-			// 这个task是不是应该做，如果不应该做就跳过
-			if (output.successCursor() >= tasker.getServiceInfo().getOrder()) {
+			// 这个task是不是应该做，如果不应该做就跳过, null==serviceInfo说明是finaltask
+			if (null == tasker.getServiceInfo() || output.successCursor() >= tasker.getServiceInfo().getOrder()) {
 				if (DoSuccessTasker.TYPE.equals(tasker.getType()) && output.success()) {// 如果成功则走success
 					absCallbacker = tasker.doTask(income, output);
 				} else if (DoFailTasker.TYPE.equals(tasker.getType()) && !output.success()) {// 如果失败则走fail
 					absCallbacker = tasker.doTask(income, output);
 				} else if (DoServiceTasker.TYPE.equals(tasker.getType()) || DoComplateTasker.TYPE.equals(tasker.getType())) {// 如果其它的正常处理
+					absCallbacker = tasker.doTask(income, output);
+				} else if (DoFinalTasker.TYPE.equals(tasker.getType())) {// 如果是finaltask直接运行
 					absCallbacker = tasker.doTask(income, output);
 				}
 
@@ -259,6 +271,7 @@ public class ServiceChain {
 					if (index + 1 < output.taskerList().size()) {
 						// 成功的游标向下走
 						AbsTasker taskerNext = (AbsTasker) output.taskerList().get(index + 1);
+						// 如果是service类型不需要判空ServiceInfo
 						int successCursor = taskerNext.getServiceInfo().getOrder();
 						if (successCursor > output.successCursor()) {
 							output.setSuccessCursor(successCursor);
@@ -266,6 +279,7 @@ public class ServiceChain {
 					}
 				}
 			}
+
 			// 如果返回是空的话说明不用异步，则继续函数嵌套走后面
 			if (null == absCallbacker) {
 				doTask(income, output);
@@ -336,8 +350,14 @@ public class ServiceChain {
 			List<AbsTasker> taskList = entry.getValue();
 			for (AbsTasker task : taskList) {
 				String taskLine = "    ";
-				Class serviceClass = AdamClassUtils.getTargetClass(task.getServiceInfo().getService());
-				ServiceOrder serviceOrder = (ServiceOrder) serviceClass.getAnnotation(ServiceOrder.class);
+				ServiceOrder serviceOrder = null;
+				String simpleName = " end ";
+				if (null != task.getServiceInfo()) {
+					Class serviceClass = AdamClassUtils.getTargetClass(task.getServiceInfo().getService());
+					simpleName = serviceClass.getSimpleName();
+					serviceOrder = (ServiceOrder) serviceClass.getAnnotation(ServiceOrder.class);
+				}
+
 				if (null != serviceOrder) {
 					String orderStr = taskLine + serviceOrder.value();
 					if (orderStr.length() < orderLong) {
@@ -347,14 +367,14 @@ public class ServiceChain {
 					}
 					taskLine = taskLine + orderStr + "  ";
 				}
-				taskLine = taskLine + serviceClass.getSimpleName() + ":" + task.getType();
+				taskLine = taskLine + simpleName + ":" + task.getType();
 				sb.append(taskLine);
 				if (taskLine.length() < lineLong) {
 					for (int spaceIndex = 0; spaceIndex < (lineLong - taskLine.length()); spaceIndex++) {
 						sb.append(" ");
 					}
 				}
-				sb.append("(" + serviceClass.getName() + ":" + task.getType() + ")");
+				sb.append("(" + simpleName + ":" + task.getType() + ")");
 				sb.append(AdamSysConstants.LINE_SEPARATOR);
 			}
 		}

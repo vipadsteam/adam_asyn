@@ -17,6 +17,8 @@ import org.springframework.adam.service.chain.ServiceChain;
  */
 public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Object, Throwable, IncomeType, OutputType> {
 
+	private AtomicBoolean doneOnce = new AtomicBoolean(false);
+
 	private List<AbsCallbacker> callbacks = new ArrayList<AbsCallbacker>();
 
 	public CallbackCombiner() {
@@ -96,7 +98,12 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 				}
 			}
 		}
-		onDoIt(null, e, COMPL_METHOD);
+		// 是否第一次完成CallbackCombiner，以防两个callback并发触发完成CallbackCombiner
+		boolean hasDoneOnce = doneOnce.compareAndSet(false, true);
+		// 第一次完成都需要往下走
+		if (hasDoneOnce) {
+			onDoIt(null, e, COMPL_METHOD);
+		}
 	}
 
 	@Override
