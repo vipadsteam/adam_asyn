@@ -5,6 +5,7 @@ package org.springframework.adam.common.bean;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -46,6 +47,8 @@ public class ResultVo<T> implements Serializable {
 	private transient AdamFuture future;
 	
 	private transient ServiceChainCallbacker scc;
+	
+	private transient AtomicBoolean isUsed = new AtomicBoolean(false);
 
 	private T data;
 
@@ -320,5 +323,12 @@ public class ResultVo<T> implements Serializable {
 	 */
 	public void setScc(ServiceChainCallbacker scc) {
 		this.scc = scc;
+	}
+
+	/**
+	 * @return the isUsed
+	 */
+	public AtomicBoolean getIsUsed() {
+		return isUsed;
 	}
 }

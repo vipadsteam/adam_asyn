@@ -193,11 +193,16 @@ public class ServiceChain {
 			return null;
 		}
 
+		// 判断output是否已经服务过了，没服务过就设置output里面isUsed
+		if (!output.getIsUsed().compareAndSet(false, true)) {
+			throw new RuntimeException("ResultVo已经服务过了,请重新new对象,服务链名：" + serviceEnum);
+		}
+
 		// 塞任务队列进output对象
 		output.setTaskerList(taskList);
 		// 塞进serviceChain
 		output.setServiceChain(this);
-		
+
 		ServiceChainCallbacker scc = new ServiceChainCallbacker();
 		output.setScc(scc);
 		scc.setChain(this, income, output);

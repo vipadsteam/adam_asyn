@@ -9,6 +9,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.adam.common.bean.ResultVo;
+import org.springframework.adam.service.callback.ServiceChainCallbacker;
 import org.springframework.adam.service.chain.ServiceChain;
 
 /**
@@ -56,6 +57,7 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 		if (callback.isCombiner()) {
 			throw new RuntimeException("combiner can not combine a combiner");
 		}
+		
 		callback.setCombiner(this);
 		this.callbacks.add(callback);
 	}
