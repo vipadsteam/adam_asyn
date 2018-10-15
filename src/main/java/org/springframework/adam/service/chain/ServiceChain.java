@@ -180,6 +180,30 @@ public class ServiceChain {
 	 * @return
 	 */
 	public ServiceChainCallbacker doServer(Object income, ResultVo output, String serviceEnum) {
+		return doServer(income, null, output, null, serviceEnum);
+	}
+
+	/**
+	 * 启动链路调用
+	 * 
+	 * @param income
+	 * @param output
+	 * @param serviceEnum
+	 * @return
+	 */
+	public ServiceChainCallbacker doServer(Object income, ResultVo output, ResultVo oldOutput, String serviceEnum) {
+		return doServer(income, null, output, oldOutput, serviceEnum);
+	}
+
+	/**
+	 * 启动链路调用
+	 * 
+	 * @param income
+	 * @param output
+	 * @param serviceEnum
+	 * @return
+	 */
+	public ServiceChainCallbacker doServer(Object income, Object oldIncome, ResultVo output, ResultVo oldOutput, String serviceEnum) {
 		// 检查初始化
 		init();
 		// 获取任务列表
@@ -203,19 +227,35 @@ public class ServiceChain {
 		// 塞进serviceChain
 		output.setServiceChain(this);
 
+		// 处理ssc
 		ServiceChainCallbacker scc = new ServiceChainCallbacker();
 		output.setScc(scc);
-		scc.setChain(this, income, output);
+		// 如果income有旧的则用旧的
+		Object tmpIncome = income;
+		if (null != oldIncome) {
+			tmpIncome = oldIncome;
+		}
+		// 如果output有旧的则用旧的
+		ResultVo tmpOutput = output;
+		if (null != oldOutput) {
+			tmpOutput = oldOutput;
+		}
+
 		// 获取future
 		AdamFuture future = output.getFuture();
+
 		// 正式处理任务
 		if (null == future) {
+			// 处理完新的链表后，应该继续处理旧的链表，因此是设置旧的income和output
+			scc.setChain(this, tmpIncome, tmpOutput);
 			doTask(income, output);
 			return scc;
 		} else {
+			// setchain dofinal才会解开才会释放线程，必须要setChain，但是future不兼容链表嵌套链表，set serviceChain为null让它callback不会走
+			scc.setChain(null, tmpIncome, tmpOutput);
 			// 如果future不为空则表明链条聚合
 			future.init(this, income, output);
-			return scc;
+			return null;
 		}
 	}
 
