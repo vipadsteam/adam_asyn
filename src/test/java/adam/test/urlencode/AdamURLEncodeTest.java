@@ -6,6 +6,7 @@ package adam.test.urlencode;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URLEncoder;
 
 import org.springframework.adam.common.utils.encode.AdamURLEncoder;
 import org.springframework.adam.common.utils.encode.impl.AdamURLEncoderImpl;
@@ -28,6 +29,8 @@ public class AdamURLEncodeTest {
 		reader.close();
 		System.out.println(AdamURLEncoder.encode(text, false));
 		System.out.println(AdamURLEncoder.encode(text, true));
+		System.out.println(AdamURLEncoder.encode(" ", true));
+		System.out.println(URLEncoder.encode(" ", "utf-8"));
 	}
 
 }
