@@ -142,22 +142,16 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 		} else {
 			try {
 				this.isSwitched = true;
-				this.tpe.execute(new Runnable() {
-					@Override
-					public void run() {
-						ThreadLocalHolder.setThreadHolder(threadHolder);
-						doit(result, e, type);
-					}
+				this.tpe.execute(() -> {
+					ThreadLocalHolder.setThreadHolder(threadHolder);
+					doit(result, e, type);
 				});
 			} catch (RejectedExecutionException r) {
 				dealException(r);
 				Executor tpe = BakThreadPoolContainer.getBakThreadPool();
-				tpe.execute(new Runnable() {
-					@Override
-					public void run() {
-						ThreadLocalHolder.setThreadHolder(threadHolder);
-						doit(result, e, type);
-					}
+				tpe.execute(() -> {
+					ThreadLocalHolder.setThreadHolder(threadHolder);
+					doit(result, e, type);
 				});
 			} catch (Throwable t) {
 				dealException(t);
