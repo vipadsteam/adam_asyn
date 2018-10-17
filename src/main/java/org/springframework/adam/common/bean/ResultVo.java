@@ -250,6 +250,10 @@ public class ResultVo<T> implements Serializable {
 	public static class ForceSet {
 
 	}
+	
+	public boolean isFinished(){
+		return serviceIndex >= taskerList.size();
+	}
 
 	public int increaseServiceIndex() {
 		return ++serviceIndex;
