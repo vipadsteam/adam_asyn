@@ -27,6 +27,7 @@ public class AdamURLEncodeTest {
 		}
 		reader.close();
 		System.out.println(AdamURLEncoder.encode(text, false));
+		System.out.println(AdamURLEncoder.encode(text, true));
 	}
 
 }

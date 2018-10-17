@@ -2,6 +2,7 @@ package org.springframework.adam.common.utils.encode;
 
 import java.net.URLEncoder;
 
+import org.springframework.adam.common.utils.encode.fast.FastEncoder;
 import org.springframework.adam.common.utils.encode.impl.AdamURLEncoderImpl;
 
 public class AdamURLEncoder {
@@ -18,10 +19,10 @@ public class AdamURLEncoder {
 	 */
 	public static String encode(String text, boolean isRadical) throws Exception {
 		if (isRadical) {
+			return FastEncoder.encode(text.getBytes());
+		} else {
 			AdamURLEncoderImpl encoder = new AdamURLEncoderImpl();
 			return encoder.encodeToString(text.getBytes());
-		} else {
-			return URLEncoder.encode(text, "utf-8");
 		}
 	}
 	
