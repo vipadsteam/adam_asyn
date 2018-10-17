@@ -5,19 +5,21 @@ package org.springframework.adam.service;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.ThreadHolder;
 import org.springframework.adam.common.utils.ThreadLocalHolder;
 import org.springframework.adam.service.chain.ServiceChain;
+import org.springframework.adam.service.threadpool.BakThreadPoolContainer;
 
 /**
  * @author USER
  *
  */
 public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, IncomeType, OutputType> {
-	
+
 	protected boolean isCombiner = false;
 
 	protected final static int SUCC_METHOD = 0;
@@ -61,6 +63,11 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 * 切换的线程池
 	 */
 	protected Executor tpe;
+
+	/**
+	 * 后备切换的线程池
+	 */
+	protected Executor tpeBak;
 
 	/**
 	 * call back合并器
@@ -136,6 +143,16 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 			try {
 				this.isSwitched = true;
 				this.tpe.execute(new Runnable() {
+					@Override
+					public void run() {
+						ThreadLocalHolder.setThreadHolder(threadHolder);
+						doit(result, e, type);
+					}
+				});
+			} catch (RejectedExecutionException r) {
+				dealException(r);
+				Executor tpe = BakThreadPoolContainer.getBakThreadPool();
+				tpe.execute(new Runnable() {
 					@Override
 					public void run() {
 						ThreadLocalHolder.setThreadHolder(threadHolder);
