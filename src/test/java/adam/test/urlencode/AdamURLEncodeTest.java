@@ -29,6 +29,7 @@ public class AdamURLEncodeTest {
 		reader.close();
 		System.out.println(AdamURLEncoder.encode(text, false));
 		System.out.println(AdamURLEncoder.encode(text, true));
+		System.out.println(URLEncoder.encode(text, "utf-8"));
 		System.out.println(AdamURLEncoder.encode(" ", true));
 		System.out.println(URLEncoder.encode(" ", "utf-8"));
 	}
