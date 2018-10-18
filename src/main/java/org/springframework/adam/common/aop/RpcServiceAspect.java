@@ -52,13 +52,13 @@ public class RpcServiceAspect {
 		// 获取信息
 		long beginTime = System.currentTimeMillis();
 		Object[] args = pjp.getArgs();
-		Signature method = pjp.getSignature();
+		String methodName = pjp.getSignature().toString();
 
 		// 新建request对象
 		RequestLogEntity requestLogEntity = null;
 		Object returnValue = null;
 
-		returnValue = doBefore(method.toString(), null, args, returnValue);
+		returnValue = doBefore(methodName, null, args, returnValue);
 		String runningAccount = "";
 		if (logService.isNeedLog()) {
 			// init running account
@@ -70,7 +70,7 @@ public class RpcServiceAspect {
 			if (logService.isNeedLog()) {
 				// 获取参数
 				requestLogEntity = new RequestLogEntity();
-				requestLogEntity.setUrl(method.toString());
+				requestLogEntity.setUrl(methodName);
 				requestLogEntity.setHeader("header:RPCServiceAspect");
 				StringBuilder argSB = new StringBuilder(2048);
 				for (Object arg : args) {
@@ -84,10 +84,10 @@ public class RpcServiceAspect {
 			if (returnValue == null) {
 				returnValue = pjp.proceed();
 			}
-			returnValue = doAfter(method.toString(), null, args, returnValue);
+			returnValue = doAfter(methodName, null, args, returnValue);
 		} catch (Throwable t) {
 			long endTime = System.currentTimeMillis();
-			logger.error("RA:" + runningAccount + " " + "Method [" + method.toString() + "] " + AdamSysConstants.LINE_SEPARATOR + "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:" + (endTime - beginTime) + t, t);
+			logger.error("RA:" + runningAccount + " " + "Method [" + methodName + "] " + AdamSysConstants.LINE_SEPARATOR + "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:" + (endTime - beginTime) + t, t);
 			ResultVo<String> resultVo = new ResultVo<String>();
 			resultVo.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_SYSTEM_ERROR);
 			resultVo.setResultMsg(AdamExceptionUtils.getStackTrace(t));
@@ -98,7 +98,7 @@ public class RpcServiceAspect {
 				ResultVo resultVo = (ResultVo) returnValue;
 				resultVo.setResultMsg("ra:" + runningAccount);
 				if (resultVo.getResultCode().startsWith(BaseReslutCodeConstants.CODE_SYSTEM_ERROR)) {
-					logService.sendTechnologyErrorAccountLog(args, returnValue, method.toString(), "系统异常");
+					logService.sendTechnologyErrorAccountLog(args, returnValue, methodName, "系统异常");
 				}
 			}
 			long endTime = System.currentTimeMillis();
