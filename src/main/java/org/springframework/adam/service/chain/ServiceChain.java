@@ -184,7 +184,7 @@ public class ServiceChain {
 	}
 
 	/**
-	 * 启动链路调用
+	 * 启动子链路调用
 	 * 
 	 * @param income
 	 * @param output
@@ -247,6 +247,9 @@ public class ServiceChain {
 			}
 			return scc;
 		} else {
+			if (isChildChain) {
+				throw new RuntimeException("子链不能用future串联");
+			}
 			// 如果future不为空则表明链条聚合
 			future.init(this, income, output);
 			return null;
