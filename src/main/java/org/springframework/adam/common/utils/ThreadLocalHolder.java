@@ -48,6 +48,9 @@ public class ThreadLocalHolder {
 		if (null == contextHolder.get()) {
 			initRunningAccount();
 		}
+		if (null == contextHolder.get().getRequestLogFlag()) {
+			return 0;
+		}
 		return contextHolder.get().getRequestLogFlag();
 	}
 
@@ -75,7 +78,7 @@ public class ThreadLocalHolder {
 		}
 		return contextHolder.get().getRemark();
 	}
-	
+
 	public static void resetRemark() {
 		if (null == contextHolder.get()) {
 			initRunningAccount();
