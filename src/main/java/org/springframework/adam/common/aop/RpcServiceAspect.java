@@ -59,12 +59,8 @@ public class RpcServiceAspect {
 		Object returnValue = null;
 
 		returnValue = doBefore(methodName, null, args, returnValue);
-		String runningAccount = "";
-		if (logService.isNeedLog()) {
-			// init running account
-			ThreadLocalHolder.initRunningAccount();
-			runningAccount = ThreadLocalHolder.getRunningAccount();
-		}
+		ThreadLocalHolder.initRunningAccount();
+		String runningAccount = ThreadLocalHolder.getRunningAccount();
 		try {
 			// 看看是不是要日志
 			if (logService.isNeedLog()) {
