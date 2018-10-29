@@ -58,8 +58,8 @@ public class RpcServiceAspect {
 		RequestLogEntity requestLogEntity = null;
 		Object returnValue = null;
 
-		returnValue = doBefore(methodName, null, args, returnValue);
 		ThreadLocalHolder.initRunningAccount();
+		returnValue = doBefore(methodName, null, args, returnValue);
 		String runningAccount = ThreadLocalHolder.getRunningAccount();
 		try {
 			// 看看是不是要日志
