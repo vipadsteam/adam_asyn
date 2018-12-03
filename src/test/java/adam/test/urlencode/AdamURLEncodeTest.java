@@ -27,8 +27,11 @@ public class AdamURLEncodeTest {
 			text = text + tempString;
 		}
 		reader.close();
-		System.out.println(AdamURLEncoder.encode(text, false));
-		System.out.println(AdamURLEncoder.encode(text, true));
+		String a = AdamURLEncoder.encode(text, false);
+		String b = AdamURLEncoder.encode(text, true);
+		System.out.println(a.equals(b));
+		System.out.println(a);
+		System.out.println(b);
 		System.out.println(URLEncoder.encode(text, "utf-8"));
 		System.out.println(AdamURLEncoder.encode(" ", true));
 		System.out.println(URLEncoder.encode(" ", "utf-8"));

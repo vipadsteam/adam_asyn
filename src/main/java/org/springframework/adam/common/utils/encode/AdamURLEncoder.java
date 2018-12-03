@@ -1,7 +1,5 @@
 package org.springframework.adam.common.utils.encode;
 
-import java.net.URLEncoder;
-
 import org.springframework.adam.common.utils.encode.fast.FastEncoder;
 import org.springframework.adam.common.utils.encode.impl.AdamURLEncoderImpl;
 
