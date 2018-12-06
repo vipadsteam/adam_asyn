@@ -90,24 +90,25 @@ public class ServiceChain {
 
 			Class clazz = AdamClassUtils.getTargetClass(service);
 
-			ServiceType serviceType = (ServiceType) clazz.getAnnotation(ServiceType.class);
-			ServiceOrder serviceOrder = (ServiceOrder) clazz.getAnnotation(ServiceOrder.class);
-
+			// service类别名
 			String serviceTypeValue = "";
-			int serviceOrderValue = 0;
-
+			ServiceType serviceType = (ServiceType) clazz.getAnnotation(ServiceType.class);
 			if (null == serviceType) {
 				continue;
 			} else {
 				serviceTypeValue = serviceType.value();
 			}
 
+			// service顺序
+			int serviceOrderValue = 0;
+			ServiceOrder serviceOrder = (ServiceOrder) clazz.getAnnotation(ServiceOrder.class);
 			if (null == serviceOrder) {
-				serviceOrderValue = 0;
+				throw new RuntimeException(clazz.getName() + " must set @ServiceOrder on the class");
 			} else {
 				serviceOrderValue = serviceOrder.value();
 			}
-			putServiceInServicesMap(serviceTypeValue, serviceOrderValue, service, servicesMap);
+
+			putServiceInServicesMap(serviceTypeValue, serviceOrderValue, service, clazz, servicesMap);
 		}
 
 		// 处理服务链
@@ -140,8 +141,9 @@ public class ServiceChain {
 	 * @param serviceEnum
 	 * @param serviceOrderValue
 	 * @param serivce
+	 * @param clazz
 	 */
-	private void putServiceInServicesMap(String serviceEnum, int serviceOrderValue, IService serivce, Map<String, List<IService>> servicesMap) {
+	private void putServiceInServicesMap(String serviceEnum, int serviceOrderValue, IService serivce, Class clazz, Map<String, List<IService>> servicesMap) {
 		List<IService> serviceList = servicesMap.get(serviceEnum);
 		if (CollectionUtils.isEmpty(serviceList)) {
 			serviceList = new ArrayList<IService>();
@@ -154,13 +156,18 @@ public class ServiceChain {
 		int realIndex = 0;
 		for (int index = 0; index < serviceList.size(); index++) {
 			IService serviceTmp = serviceList.get(index);
-			ServiceOrder serviceOrderTmp = (ServiceOrder) AdamClassUtils.getTargetClass(serviceTmp).getAnnotation(ServiceOrder.class);
-			// 没设置serviceorder默认第一个
+			Class tmpClass = AdamClassUtils.getTargetClass(serviceTmp);
+			ServiceOrder serviceOrderTmp = (ServiceOrder) tmpClass.getAnnotation(ServiceOrder.class);
+
+			// 不允许没设置serviceOrder
 			if (null == serviceOrderTmp) {
-				realIndex = 0;
-				break;
+				throw new RuntimeException(tmpClass.getName() + " must set @ServiceOrder on the class");
 			}
-			if (serviceOrderValue <= serviceOrderTmp.value()) {
+
+			// 不允许有相同的serviceOrder
+			if (serviceOrderValue == serviceOrderTmp.value()) {
+				throw new RuntimeException(tmpClass.getName() + " and " + clazz.getName() + " have same order, is not allowed");
+			} else if (serviceOrderValue < serviceOrderTmp.value()) { 
 				realIndex = index;
 				break;
 			} else {
