@@ -8,6 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.adam.backpressure.BackPressureUtils;
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.ThreadHolder;
 import org.springframework.adam.common.utils.ThreadLocalHolder;
@@ -147,6 +148,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 					doit(result, e, type);
 				});
 			} catch (RejectedExecutionException r) {
+				BackPressureUtils.errIncrease(r);
 				dealException(r);
 				Executor tpe = BakThreadPoolContainer.getBakThreadPool();
 				tpe.execute(() -> {
@@ -154,6 +156,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 					doit(result, e, type);
 				});
 			} catch (Throwable t) {
+				BackPressureUtils.errIncrease(t);
 				dealException(t);
 			}
 		}
