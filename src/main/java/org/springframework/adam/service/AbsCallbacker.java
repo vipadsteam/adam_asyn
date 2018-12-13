@@ -156,7 +156,6 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 					doit(result, e, type);
 				});
 			} catch (Throwable t) {
-				BackPressureUtils.errIncrease(t);
 				dealException(t);
 			}
 		}
@@ -182,6 +181,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 				break;
 			}
 		} catch (Throwable t) {
+			BackPressureUtils.errIncrease(t);
 			dealException(t);
 		} finally {
 			// 如果是complete就没必要再onComplete, complete完了就workNext
