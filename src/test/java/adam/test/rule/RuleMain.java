@@ -22,7 +22,7 @@ import org.springframework.adam.common.rule.engine.AdamRuleExcutor;
 public class RuleMain {
 
 //	private static final String RULE_STR = "!(!ug001&ug005)|!((!ug002&ug003)|((ug004|!ug005)&ug006))";
-	private static final String RULE_STR = "((ug004&!ug005))|ug006)";
+	private static final String RULE_STR = "((ug004&!ug005)|ug006)";
 //	private static final String RULE_STR = "ug001&!([fr0032|00024_324-2你好:asf]|![fr0033|00044_324-2你好:4sf])";
 //	private static final String RULE_STR = "[fr0032|00004_324-2你好:asf]";
 	private static Map<String, String> ruleMap = new HashMap<String, String>();
