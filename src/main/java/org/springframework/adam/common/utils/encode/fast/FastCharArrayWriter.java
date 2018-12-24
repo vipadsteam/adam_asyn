@@ -23,12 +23,10 @@ public class FastCharArrayWriter {
 	}
 
 	public void write(char c) {
-		int newcount = count + 1;
-		if (newcount > buf.length) {
-			buf = Arrays.copyOf(buf, Math.max(buf.length << 1, newcount));
-		}
 		buf[count] = c;
-		count = newcount;
+		if (++count >= buf.length) {
+			buf = Arrays.copyOf(buf, Math.max(buf.length << 1, count));
+		}
 	}
 
 	public void write3(char c1, char c2, char c3) {
