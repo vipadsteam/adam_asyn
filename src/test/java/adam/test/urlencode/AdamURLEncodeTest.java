@@ -11,6 +11,8 @@ import java.net.URLEncoder;
 import org.springframework.adam.common.utils.encode.AdamURLEncoder;
 import org.springframework.adam.common.utils.encode.impl.AdamURLEncoderImpl;
 
+import adam.test.rule.AdsCache;
+
 /**
  * @author USER
  *
@@ -35,6 +37,12 @@ public class AdamURLEncodeTest {
 		System.out.println(URLEncoder.encode(text, "utf-8"));
 		System.out.println(AdamURLEncoder.encode(" ", true));
 		System.out.println(URLEncoder.encode(" ", "utf-8"));
+		
+		AdsCache cache = new AdsCache();
+		cache.refresh("30");
+		AdamURLEncoder.setCache(cache);
+		System.out.println(AdamURLEncoder.encode("http://www.baidu.com", true));
+		System.out.println(AdamURLEncoder.encode("http://www.baidu.com", true));
 	}
 
 }
