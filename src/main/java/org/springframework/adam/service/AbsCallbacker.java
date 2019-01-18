@@ -221,8 +221,12 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 		serviceChain.doTask(income, output);
 	}
 
-	public void setExcutor(Executor tpe) {
+	public void setExecutor(Executor tpe) {
 		this.tpe = tpe;
+	}
+	
+	public Executor getExecutor() {
+		return this.tpe;
 	}
 
 	/**
