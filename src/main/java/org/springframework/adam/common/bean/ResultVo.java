@@ -251,7 +251,7 @@ public class ResultVo<T> implements Serializable {
 
 	}
 	
-	public boolean isFinished(){
+	public boolean finished(){
 		return serviceIndex >= taskerList.size();
 	}
 

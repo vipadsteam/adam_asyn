@@ -249,7 +249,7 @@ public class ServiceChain {
 		if (null == future) {
 			doTask(income, output);
 			// 如果全链都是同步操作则不需要返回scc
-			if (output.isFinished()) {
+			if (output.finished()) {
 				return null;
 			}
 			return scc;
