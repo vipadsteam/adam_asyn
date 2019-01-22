@@ -34,6 +34,8 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	protected volatile IncomeType income;
 
 	protected volatile ResultVo<OutputType> output;
+	
+	protected IAdamSender sender;
 
 	/**
 	 * 有没做过一次Complete method
@@ -138,6 +140,12 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 */
 	protected void onDoIt(ResultType result, ErrorType e, int type) {
 		ThreadLocalHolder.setThreadHolder(threadHolder);
+		if(null != sender && needResend(result, e, type)){
+			sender.doSend(this);
+			return;
+		}
+		
+		// 切换线程
 		if (null == this.tpe || true == this.isSwitched) {
 			doit(result, e, type);
 		} else {
@@ -159,6 +167,18 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 				dealException(t);
 			}
 		}
+	}
+
+	/**
+	 * 如果需要重发则@Override这个方法
+	 * 
+	 * @param result
+	 * @param e
+	 * @param type
+	 * @return
+	 */
+	public boolean needResend(ResultType result, ErrorType e, int type) {
+		return false;
 	}
 
 	private void doit(ResultType result, ErrorType e, int type) {
@@ -273,6 +293,20 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 
 	public boolean isCombiner() {
 		return isCombiner;
+	}
+
+	/**
+	 * @return the sender
+	 */
+	public IAdamSender getSender() {
+		return sender;
+	}
+
+	/**
+	 * @param sender the sender to set
+	 */
+	public void setSender(IAdamSender sender) {
+		this.sender = sender;
 	}
 
 }
