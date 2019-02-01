@@ -6,6 +6,7 @@ package adam.test.urlencode;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URI;
 import java.net.URLEncoder;
 
 import org.springframework.adam.common.utils.encode.AdamURLEncoder;
@@ -43,6 +44,9 @@ public class AdamURLEncodeTest {
 		AdamURLEncoder.setCache(cache);
 		System.out.println(AdamURLEncoder.encode("http://www.baidu.com", true));
 		System.out.println(AdamURLEncoder.encode("http://www.baidu.com", true));
+		String str = "http://www.baidu.com/张晓将test.jpg?a=张晓将";
+		System.out.println(URI.create(str).toASCIIString());
+		System.out.println(URI.create(URI.create(str).toASCIIString()).toASCIIString());
 	}
 
 }

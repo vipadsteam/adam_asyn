@@ -10,7 +10,6 @@ import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.ServiceInfo;
 import org.springframework.adam.common.bean.contants.BaseReslutCodeConstants;
 import org.springframework.adam.common.utils.AdamExceptionUtils;
-import org.springframework.adam.service.callback.ServiceChainCallbacker;
 import org.springframework.adam.service.task.DoComplateTasker;
 import org.springframework.adam.service.task.DoFailTasker;
 import org.springframework.adam.service.task.DoServiceTasker;
@@ -92,10 +91,6 @@ public abstract class AbsTasker<T1, T2> {
 			return;
 		}
 
-		if (!serviceInfo.isLog()) {
-			return;
-		}
-
 		String methodName = serviceInfo.getSimpleClassName() + "." + this.type;
 		try {
 			logService.sendRunningAccountLog(income, output, methodName, remark, beginTime);
@@ -112,42 +107,34 @@ public abstract class AbsTasker<T1, T2> {
 	 * @return
 	 */
 	protected AbsCallbacker exc(T1 income, ResultVo<T2> output, boolean isSetResultCode) {
-		String oldResultCode = output.getResultCode();
 		AbsCallbacker absCallbacker = null;
 		// 如果为空则说明只有一种情况就是DoFinalTask的,但是也不会走到这里的
-		if(null == this.serviceInfo){
+		if (null == this.serviceInfo) {
 			return null;
 		}
-		int retryTimes = this.serviceInfo.getFailRetryTimes();
-		for (int retryTimeindex = 0; retryTimeindex < retryTimes; retryTimeindex++) {
-			long begin = System.currentTimeMillis();
-			addBeginLog(income, output);
-			try {
-				if (DoServiceTasker.TYPE.equals(this.type)) {
-					absCallbacker = serviceInfo.getService().doService(income, output);
-				} else if (DoSuccessTasker.TYPE.equals(this.type)) {
-					absCallbacker = serviceInfo.getService().doSuccess(income, output);
-				} else if (DoFailTasker.TYPE.equals(this.type)) {
-					absCallbacker = serviceInfo.getService().doFail(income, output);
-				} else if (DoComplateTasker.TYPE.equals(this.type)) {
-					absCallbacker = serviceInfo.getService().doComplate(income, output);
-				}
-				addEndLog(income, output, begin);
-				break;
-			} catch (Exception e) {
-				log.error(e, e);
-				if (isSetResultCode) {
-					if (output.success()) {
-						output.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_900000);
-					}
-				}
-				output.setResultMsg("system error occor:" + AdamExceptionUtils.getStackTrace(e));
-				// 不能放finally，要不然resultCode就不是真实的
-				addEndLog(income, output, begin);
-				if (retryTimeindex < retryTimes - 1) {
-					output.setResultCode(this.getClass(), oldResultCode);
+		long begin = System.currentTimeMillis();
+		addBeginLog(income, output);
+		try {
+			if (DoServiceTasker.TYPE.equals(this.type)) {
+				absCallbacker = serviceInfo.getService().doService(income, output);
+			} else if (DoSuccessTasker.TYPE.equals(this.type)) {
+				absCallbacker = serviceInfo.getService().doSuccess(income, output);
+			} else if (DoFailTasker.TYPE.equals(this.type)) {
+				absCallbacker = serviceInfo.getService().doFail(income, output);
+			} else if (DoComplateTasker.TYPE.equals(this.type)) {
+				absCallbacker = serviceInfo.getService().doComplate(income, output);
+			}
+		} catch (Exception e) {
+			log.error(e, e);
+			if (isSetResultCode) {
+				if (output.success()) {
+					output.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_900000);
 				}
 			}
+			output.setResultMsg("system error occor:" + AdamExceptionUtils.getStackTrace(e));
+			// 不能放finally，要不然resultCode就不是真实的
+		} finally {
+			addEndLog(income, output, begin);
 		}
 		return absCallbacker;
 	}
