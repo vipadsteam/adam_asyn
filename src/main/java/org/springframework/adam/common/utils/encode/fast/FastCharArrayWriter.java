@@ -31,7 +31,7 @@ public class FastCharArrayWriter {
 
 	public void write3(char c1, char c2, char c3) {
 		int newcount = count + 3;
-		if (newcount > buf.length) {
+		if (newcount >= buf.length) {
 			buf = Arrays.copyOf(buf, Math.max(buf.length << 1, newcount));
 		}
 		buf[count] = c1;

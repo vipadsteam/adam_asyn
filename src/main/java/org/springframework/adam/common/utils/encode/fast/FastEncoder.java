@@ -17,7 +17,7 @@ public class FastEncoder {
 			return null;
 		}
 
-		final FastCharArrayWriter writer = new FastCharArrayWriter(bytes.length << 1);
+		final FastCharArrayWriter writer = new FastCharArrayWriter(bytes.length << 1 + 1);
 
 		for (final byte c : bytes) {
 			int b = c & 255;
