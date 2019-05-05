@@ -14,7 +14,9 @@ public interface IService<T1, T2> {
 	 * @throws Exception
 	 *             Exception
 	 */
-	AbsCallbacker doService(T1 income, ResultVo<T2> output) throws Exception;
+	default AbsCallbacker doService(T1 income, ResultVo<T2> output) throws Exception {
+		return null;
+	}
 
 	/**
 	 * doSuccess 成功服务
@@ -26,7 +28,9 @@ public interface IService<T1, T2> {
 	 * @throws Exception
 	 *             Exception
 	 */
-	AbsCallbacker doSuccess(T1 income, ResultVo<T2> output) throws Exception;
+	default AbsCallbacker doSuccess(T1 income, ResultVo<T2> output) throws Exception {
+		return null;
+	}
 
 	/**
 	 * doFail 失败服务
@@ -38,7 +42,9 @@ public interface IService<T1, T2> {
 	 * @throws Exception
 	 *             Exception
 	 */
-	AbsCallbacker doFail(T1 income, ResultVo<T2> output) throws Exception;
+	default AbsCallbacker doFail(T1 income, ResultVo<T2> output) throws Exception {
+		return null;
+	}
 
 	/**
 	 * doComplate 完成服务
@@ -50,5 +56,7 @@ public interface IService<T1, T2> {
 	 * @throws Exception
 	 *             Exception
 	 */
-	AbsCallbacker doComplate(T1 income, ResultVo<T2> output) throws Exception;
+	default AbsCallbacker doComplate(T1 income, ResultVo<T2> output) throws Exception {
+		return null;
+	}
 }

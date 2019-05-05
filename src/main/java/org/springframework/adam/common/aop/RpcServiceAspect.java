@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.adam.client.ILogService;
@@ -37,10 +36,10 @@ public class RpcServiceAspect {
 
 	private static Logger logger = Logger.getLogger(RpcServiceAspect.class);
 
-	@Autowired
+	@Autowired(required = false)
 	private ILogService logService;
 
-	@Autowired
+	@Autowired(required = false)
 	private IRequestHook requestHook;
 
 	@Around("@annotation(org.springframework.adam.common.bean.annotation.service.RpcService)")
@@ -83,7 +82,8 @@ public class RpcServiceAspect {
 			returnValue = doAfter(methodName, null, args, returnValue);
 		} catch (Throwable t) {
 			long endTime = System.currentTimeMillis();
-			logger.error("RA:" + runningAccount + " " + "Method [" + methodName + "] " + AdamSysConstants.LINE_SEPARATOR + "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:" + (endTime - beginTime) + t, t);
+			logger.error("RA:" + runningAccount + " " + "Method [" + methodName + "] " + AdamSysConstants.LINE_SEPARATOR + "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:"
+					+ (endTime - beginTime) + t, t);
 			ResultVo<String> resultVo = new ResultVo<String>();
 			resultVo.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_SYSTEM_ERROR);
 			resultVo.setResultMsg(AdamExceptionUtils.getStackTrace(t));

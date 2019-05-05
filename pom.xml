@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework</groupId>
 	<artifactId>adam_asyn</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -14,6 +13,12 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.31.Final</version>
+		</dependency>
+
 		<!-- test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -177,18 +182,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- proxool -->
-		<dependency>
-			<groupId>com.cloudhopper.proxool</groupId>
-			<artifactId>proxool</artifactId>
-			<version>${proxool.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cloudhopper.proxool</groupId>
-			<artifactId>proxool-cglib</artifactId>
-			<version>${proxool.version}</version>
-		</dependency>
-
 		<!-- redis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -230,12 +223,8 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
-			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
-				<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
-				<archive> <manifest> <mainClass>org.springframework.adam.common.rule.RuleMain</mainClass> 
-				</manifest> </archive> </configuration> <executions> <execution> <id>make-assembly</id> 
-				<phase>package</phase> <goals> <goal>single</goal> </goals> </execution> 
-				</executions> </plugin> -->
+			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> <archive> <manifest> <mainClass>org.springframework.adam.common.rule.RuleMain</mainClass> 
+				</manifest> </archive> </configuration> <executions> <execution> <id>make-assembly</id> <phase>package</phase> <goals> <goal>single</goal> </goals> </execution> </executions> </plugin> -->
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<executions>

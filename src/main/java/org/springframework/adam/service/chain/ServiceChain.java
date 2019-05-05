@@ -118,14 +118,24 @@ public class ServiceChain {
 			List<IService> serviceList = entry.getValue();
 			// service进
 			for (IService service : serviceList) {
-				taskList.add(new DoServiceTasker(service, logService, serviceBefore));
+				Class clazz = AdamClassUtils.getTargetClass(service);
+				if (hasServiceTask(clazz)) {
+					taskList.add(new DoServiceTasker(service, logService, serviceBefore));
+				}
 			}
 			// 其它的出
 			for (int index = 1; index <= serviceList.size(); index++) {
 				IService service = serviceList.get(serviceList.size() - index);
-				taskList.add(new DoSuccessTasker(service, logService, serviceBefore));
-				taskList.add(new DoFailTasker(service, logService, serviceBefore));
-				taskList.add(new DoComplateTasker(service, logService, serviceBefore));
+				Class clazz = AdamClassUtils.getTargetClass(service);
+				if (hasSuccessTask(clazz)) {
+					taskList.add(new DoSuccessTasker(service, logService, serviceBefore));
+				}
+				if (hasFailTask(clazz)) {
+					taskList.add(new DoFailTasker(service, logService, serviceBefore));
+				}
+				if (hasComplateTask(clazz)) {
+					taskList.add(new DoComplateTasker(service, logService, serviceBefore));
+				}
 			}
 			// 加入个FinalTask
 			taskList.add(new DoFinalTasker(logService));
@@ -133,6 +143,50 @@ public class ServiceChain {
 
 		isReady.set(true);
 		log.info(this);
+	}
+
+	private boolean hasServiceTask(Class clazz) {
+		try {
+			if (null != clazz.getDeclaredMethod("doService", Object.class, ResultVo.class)) {
+				return true;
+			}
+		} catch (NoSuchMethodException | SecurityException e) {
+			// nothing to do
+		}
+		return false;
+	}
+
+	private boolean hasSuccessTask(Class clazz) {
+		try {
+			if (null != clazz.getDeclaredMethod("doSuccess", Object.class, ResultVo.class)) {
+				return true;
+			}
+		} catch (NoSuchMethodException | SecurityException e) {
+			// nothing to do
+		}
+		return false;
+	}
+
+	private boolean hasFailTask(Class clazz) {
+		try {
+			if (null != clazz.getDeclaredMethod("doFail", Object.class, ResultVo.class)) {
+				return true;
+			}
+		} catch (NoSuchMethodException | SecurityException e) {
+			// nothing to do
+		}
+		return false;
+	}
+
+	private boolean hasComplateTask(Class clazz) {
+		try {
+			if (null != clazz.getDeclaredMethod("doComplate", Object.class, ResultVo.class)) {
+				return true;
+			}
+		} catch (NoSuchMethodException | SecurityException e) {
+			// nothing to do
+		}
+		return false;
 	}
 
 	/**
@@ -167,7 +221,7 @@ public class ServiceChain {
 			// 不允许有相同的serviceOrder
 			if (serviceOrderValue == serviceOrderTmp.value()) {
 				throw new RuntimeException(tmpClass.getName() + " and " + clazz.getName() + " have same order, is not allowed");
-			} else if (serviceOrderValue < serviceOrderTmp.value()) { 
+			} else if (serviceOrderValue < serviceOrderTmp.value()) {
 				realIndex = index;
 				break;
 			} else {
