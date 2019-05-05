@@ -4,6 +4,9 @@ import java.net.UnknownHostException;
 
 import org.springframework.adam.common.bean.RequestLogEntity;
 import org.springframework.adam.common.bean.ResultVo;
+import org.springframework.adam.common.utils.AdamExceptionUtils;
+
+import com.alibaba.fastjson.JSON;
 
 public interface ILogService {
 
@@ -60,5 +63,34 @@ public interface ILogService {
 	 */
 	default boolean isNeedLog() {
 		return false;
+	}
+
+	static String getFormatParamString(Object income, Object output, String methodName, String remark) {
+		String tmpStr = "///methodName: " + methodName + "///remark: " + remark;
+		return tmpStr + "///income: " + obj2Str(income) + "///output: " + obj2Str(output);
+	}
+
+	static String obj2Str(Object income) {
+		if (null == income) {
+			return "";
+		}
+
+		if (income instanceof Class) {
+			return ((Class) income).getName();
+		}
+
+		if (income instanceof String) {
+			return income.toString();
+		}
+
+		if (income instanceof Throwable) {
+			return AdamExceptionUtils.getStackTrace((Throwable) income);
+		}
+
+		try {
+			return JSON.toJSONString(income);
+		} catch (Exception e) {
+			return income.toString();
+		}
 	}
 }

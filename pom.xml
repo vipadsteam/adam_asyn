@@ -6,7 +6,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.2.0.RELEASE</spring.version>
+		<spring.version>4.3.16.RELEASE</spring.version>
 		<jackson.version>1.9.12</jackson.version>
 		<proxool.version>0.9.1</proxool.version>
 		<org.apache.activemq>5.10.0</org.apache.activemq>

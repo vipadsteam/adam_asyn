@@ -54,7 +54,7 @@ public class ServiceChain {
 	 */
 	private Map<String, List<AbsTasker>> tasksMap = new ConcurrentHashMap<String, List<AbsTasker>>();
 
-	@Autowired
+	@Autowired(required = false)
 	private ILogService logService;
 
 	private AtomicBoolean isReady = new AtomicBoolean(false);

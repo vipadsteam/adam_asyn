@@ -3,6 +3,7 @@
  */
 package adam.test.rule;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.cache.Cache;
@@ -27,6 +28,12 @@ public class AdsCache extends CommonLocalCache implements Cache {
 
 	public void refresh(String expStr) {
 		cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).maximumSize(20000).concurrencyLevel(256).initialCapacity(2048).build();
+	}
+
+	@Override
+	public <T> T get(Object arg0, Callable<T> arg1) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
