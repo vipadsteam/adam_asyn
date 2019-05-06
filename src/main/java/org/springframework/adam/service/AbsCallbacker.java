@@ -36,7 +36,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 
 	protected volatile ResultVo<OutputType> output;
 
-	protected IAdamSender sender;
+	protected volatile IAdamSender sender;
 
 	/**
 	 * 有没做过一次Complete method
@@ -66,12 +66,12 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * 切换的线程池
 	 */
-	protected Executor tpe;
+	protected volatile Executor tpe;
 
 	/**
 	 * 后备切换的线程池
 	 */
-	protected Executor tpeBak;
+	protected volatile Executor tpeBak;
 
 	/**
 	 * call back合并器
@@ -86,7 +86,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * 母线程ID，发送请求的线程ID
 	 */
-	protected long motherThreadId;
+	protected volatile long motherThreadId;
 
 	/**
 	 * countdownLatch wait time (second)
