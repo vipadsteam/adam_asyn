@@ -91,7 +91,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * countdownLatch wait time (second)
 	 */
-	protected volatile long waitTime = 600;
+	protected volatile long waitTime = 600;// 默认10分钟超时时间
 
 	/**
 	 * 线程专用
@@ -107,7 +107,9 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	public AbsCallbacker(long motherThreadId, long waitTime) {
 		super();
 		this.motherThreadId = motherThreadId;
-		this.waitTime = waitTime;
+		if (0 != waitTime) {
+			this.waitTime = waitTime;
+		}
 		setThreadHolder(ThreadLocalHolder.getThreadHolder());
 	}
 

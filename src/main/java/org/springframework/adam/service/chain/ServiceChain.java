@@ -241,7 +241,7 @@ public class ServiceChain {
 	 * @return
 	 */
 	public void doServer(Object income, ResultVo output, String serviceEnum) {
-		doServer(income, output, serviceEnum, false);
+		doServer(income, output, serviceEnum, 0, false);
 	}
 
 	/**
@@ -253,7 +253,20 @@ public class ServiceChain {
 	 * @return
 	 */
 	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, String serviceEnum) {
-		return doServer(income, output, serviceEnum, true);
+		return doServerWithCallback(income, output, serviceEnum, 0);
+	}
+
+	/**
+	 * 启动子链路调用
+	 * 
+	 * @param income
+	 * @param output
+	 * @param serviceEnum
+	 * @param waitSecond
+	 * @return
+	 */
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, String serviceEnum, long waitSecond) {
+		return doServer(income, output, serviceEnum, waitSecond, true);
 	}
 
 	/**
@@ -264,7 +277,7 @@ public class ServiceChain {
 	 * @param serviceEnum
 	 * @return
 	 */
-	private ServiceChainCallbacker doServer(Object income, ResultVo output, String serviceEnum, boolean isChildChain) {
+	private ServiceChainCallbacker doServer(Object income, ResultVo output, String serviceEnum, long waitSecond, boolean isChildChain) {
 		// 检查初始化
 		init();
 		// 获取任务列表
@@ -292,7 +305,7 @@ public class ServiceChain {
 		ServiceChainCallbacker scc = null;
 		// 如果是子链才需要callback
 		if (isChildChain) {
-			scc = new ServiceChainCallbacker();
+			scc = new ServiceChainCallbacker(waitSecond);
 			output.setScc(scc);
 		}
 

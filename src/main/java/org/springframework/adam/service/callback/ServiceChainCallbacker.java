@@ -15,8 +15,8 @@ public class ServiceChainCallbacker extends AbsCallbacker<Object, Throwable, Obj
 
 	private static final Log log = LogFactory.getLog(ServiceChainCallbacker.class);
 
-	public ServiceChainCallbacker() {
-		super(Thread.currentThread().getId());
+	public ServiceChainCallbacker(long waitSecond) {
+		super(Thread.currentThread().getId(), waitSecond);
 	}
 
 	@Override
