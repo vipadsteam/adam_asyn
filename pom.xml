@@ -7,9 +7,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.3.16.RELEASE</spring.version>
-		<jackson.version>1.9.12</jackson.version>
-		<proxool.version>0.9.1</proxool.version>
-		<org.apache.activemq>5.10.0</org.apache.activemq>
 	</properties>
 
 	<dependencies>
@@ -24,11 +21,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- spring -->
