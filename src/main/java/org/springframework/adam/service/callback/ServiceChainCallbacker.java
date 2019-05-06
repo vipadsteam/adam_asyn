@@ -3,6 +3,8 @@
  */
 package org.springframework.adam.service.callback;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.adam.service.AbsCallbacker;
 
 /**
@@ -11,6 +13,8 @@ import org.springframework.adam.service.AbsCallbacker;
  */
 public class ServiceChainCallbacker extends AbsCallbacker<Object, Throwable, Object, Object> {
 
+	private static final Log log = LogFactory.getLog(ServiceChainCallbacker.class);
+
 	public ServiceChainCallbacker() {
 		super(Thread.currentThread().getId());
 	}
@@ -18,25 +22,23 @@ public class ServiceChainCallbacker extends AbsCallbacker<Object, Throwable, Obj
 	@Override
 	public void dealSuccess(Object result) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dealFail(Throwable e) {
-		// TODO Auto-generated method stub
-		
+		log.error("ServiceChainCallbacker fail:", e);
 	}
 
 	@Override
 	public void dealComplete(Object result, Throwable e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dealException(Throwable t) {
-		// TODO Auto-generated method stub
-		
+		log.error("ServiceChainCallbacker exception:", t);
 	}
 
 }

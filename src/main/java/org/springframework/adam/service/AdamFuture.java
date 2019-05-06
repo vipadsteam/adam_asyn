@@ -6,6 +6,7 @@ package org.springframework.adam.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.adam.common.bean.AdamParamPair;
 import org.springframework.adam.common.bean.ResultVo;
@@ -45,9 +46,14 @@ public class AdamFuture {
 		pairList.add(new AdamParamPair(income, output));
 	}
 
-	public void waitEnd() {
+	public boolean waitEnd(long timeout, TimeUnit unit) {
 		try {
-			latch.await();
+			if (timeout == 0) {
+				latch.await();
+				return true;
+			} else {
+				return latch.await(timeout, unit);
+			}
 		} catch (InterruptedException e) {
 			throw new RuntimeException("future error can not wait work end:", e);
 		}

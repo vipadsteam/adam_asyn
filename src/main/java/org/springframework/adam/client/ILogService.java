@@ -70,6 +70,16 @@ public interface ILogService {
 		return tmpStr + "///income: " + obj2Str(income) + "///output: " + obj2Str(output);
 	}
 
+	static StringBuilder objs2Str(StringBuilder msg, Object[] objs) {
+		for (Object obj : objs) {
+			if (null == obj) {
+				continue;
+			}
+			msg.append(ILogService.obj2Str(obj) + "|");
+		}
+		return msg;
+	}
+
 	static String obj2Str(Object income) {
 		if (null == income) {
 			return "";

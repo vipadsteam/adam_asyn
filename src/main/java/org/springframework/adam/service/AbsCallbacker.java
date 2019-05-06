@@ -6,6 +6,7 @@ package org.springframework.adam.service;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.adam.backpressure.BackPressureUtils;
@@ -34,7 +35,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	protected volatile IncomeType income;
 
 	protected volatile ResultVo<OutputType> output;
-	
+
 	protected IAdamSender sender;
 
 	/**
@@ -88,6 +89,11 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	protected long motherThreadId;
 
 	/**
+	 * countdownLatch wait time (second)
+	 */
+	protected volatile long waitTime = 60;
+
+	/**
 	 * 线程专用
 	 */
 	protected ThreadHolder threadHolder = new ThreadHolder();
@@ -95,6 +101,13 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	public AbsCallbacker(long motherThreadId) {
 		super();
 		this.motherThreadId = motherThreadId;
+		setThreadHolder(ThreadLocalHolder.getThreadHolder());
+	}
+
+	public AbsCallbacker(long motherThreadId, long waitTime) {
+		super();
+		this.motherThreadId = motherThreadId;
+		this.waitTime = waitTime;
 		setThreadHolder(ThreadLocalHolder.getThreadHolder());
 	}
 
@@ -140,11 +153,11 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 */
 	protected void onDoIt(ResultType result, ErrorType e, int type) {
 		ThreadLocalHolder.setThreadHolder(threadHolder);
-		if(null != sender && needResend(result, e, type)){
+		if (null != sender && needResend(result, e, type)) {
 			sender.doSend(this);
 			return;
 		}
-		
+
 		// 切换线程
 		if (null == this.tpe || true == this.isSwitched) {
 			doit(result, e, type);
@@ -244,7 +257,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	public void setExecutor(Executor tpe) {
 		this.tpe = tpe;
 	}
-	
+
 	public Executor getExecutor() {
 		return this.tpe;
 	}
@@ -273,7 +286,9 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 			return;
 		}
 		try {
-			latch.await();
+			if (!latch.await(waitTime, TimeUnit.SECONDS)) {
+				throw new RuntimeException("callback wait service chain timeout:" + this.getClass().getName() + " for time:" + waitTime + " seconds.");
+			}
 		} catch (InterruptedException e) {
 			throw new RuntimeException("callback error can not wait service chain and output", e);
 		}
@@ -303,7 +318,8 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	}
 
 	/**
-	 * @param sender the sender to set
+	 * @param sender
+	 *            the sender to set
 	 */
 	public void setSender(IAdamSender sender) {
 		this.sender = sender;
