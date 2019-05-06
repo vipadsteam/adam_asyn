@@ -91,7 +91,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	/**
 	 * countdownLatch wait time (second)
 	 */
-	protected volatile long waitTime = 60;
+	protected volatile long waitTime = 600;
 
 	/**
 	 * 线程专用
