@@ -19,7 +19,7 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 
 	private AtomicBoolean doneOnce = new AtomicBoolean(false);
 
-	private volatile List<AbsCallbacker> callbacks = new ArrayList<AbsCallbacker>();
+	private final List<AbsCallbacker> callbacks = new ArrayList<AbsCallbacker>();
 
 	public CallbackCombiner() {
 		super(Thread.currentThread().getId());
@@ -56,7 +56,7 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 		if (callback.isCombiner()) {
 			throw new RuntimeException("combiner can not combine a combiner");
 		}
-		
+
 		callback.setCombiner(this);
 		this.callbacks.add(callback);
 	}
@@ -129,10 +129,6 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 
 	public List<AbsCallbacker> getCallbacks() {
 		return callbacks;
-	}
-
-	public void setCallbacks(List<AbsCallbacker> callbacks) {
-		this.callbacks = callbacks;
 	}
 
 }
