@@ -19,7 +19,7 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 
 	private AtomicBoolean doneOnce = new AtomicBoolean(false);
 
-	private List<AbsCallbacker> callbacks = new ArrayList<AbsCallbacker>();
+	private volatile List<AbsCallbacker> callbacks = new ArrayList<AbsCallbacker>();
 
 	public CallbackCombiner() {
 		super(Thread.currentThread().getId());
