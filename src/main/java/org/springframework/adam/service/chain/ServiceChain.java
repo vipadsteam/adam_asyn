@@ -315,10 +315,6 @@ public class ServiceChain {
 		// 正式处理任务
 		if (null == future) {
 			doTask(income, output);
-			// 如果全链都是同步操作则不需要返回scc
-			if (output.finished()) {
-				return null;
-			}
 			return scc;
 		} else {
 			if (isChildChain) {
