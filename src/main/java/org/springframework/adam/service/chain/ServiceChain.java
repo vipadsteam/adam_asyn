@@ -315,6 +315,10 @@ public class ServiceChain {
 		// 正式处理任务
 		if (null == future) {
 			doTask(income, output);
+			// 如果全链都是同步操作则不需要返回scc
+			if (!output.isAsyn()) {
+				return null;
+			}
 			return scc;
 		} else {
 			if (isChildChain) {
@@ -403,11 +407,13 @@ public class ServiceChain {
 					return;
 				} else {
 					// 把东西都设置好，让callback来完成后面的工作
+					output.setAsyn(true);
 					absCallbacker.setChain(this, income, output);
 					return;
 				}
 			} else {
 				// 把东西都设置好，让callback来完成后面的工作
+				output.setAsyn(true);
 				absCallbacker.setChain(this, income, output);
 				return;
 			}

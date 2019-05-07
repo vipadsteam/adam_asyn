@@ -45,10 +45,12 @@ public class ResultVo<T> implements Serializable {
 	private transient AbsTasker nowTasker;
 
 	private transient AdamFuture future;
-	
+
 	private transient ServiceChainCallbacker scc;
-	
-	private transient AtomicBoolean isUsed = new AtomicBoolean(false);
+
+	private AtomicBoolean isAsyn = new AtomicBoolean(false);
+
+	private AtomicBoolean isUsed = new AtomicBoolean(false);
 
 	private T data;
 
@@ -250,8 +252,8 @@ public class ResultVo<T> implements Serializable {
 	public static class ForceSet {
 
 	}
-	
-	public boolean finished(){
+
+	public boolean finished() {
 		return serviceIndex >= taskerList.size();
 	}
 
@@ -323,7 +325,8 @@ public class ResultVo<T> implements Serializable {
 	}
 
 	/**
-	 * @param scc the scc to set
+	 * @param scc
+	 *            the scc to set
 	 */
 	public void setScc(ServiceChainCallbacker scc) {
 		this.scc = scc;
@@ -334,5 +337,13 @@ public class ResultVo<T> implements Serializable {
 	 */
 	public AtomicBoolean getIsUsed() {
 		return isUsed;
+	}
+
+	public boolean isAsyn() {
+		return isAsyn.get();
+	}
+
+	public void setAsyn(boolean isAsyn) {
+		this.isAsyn.set(isAsyn);
 	}
 }
