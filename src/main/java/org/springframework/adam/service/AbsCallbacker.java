@@ -89,6 +89,11 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	protected volatile long motherThreadId;
 
 	/**
+	 * 触发callback的线程ID
+	 */
+	protected volatile long traggerThreadId = 0;
+
+	/**
 	 * countdownLatch wait time (second)
 	 */
 	protected volatile long waitTime = 600;// 默认10分钟超时时间
@@ -154,6 +159,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 * @param type
 	 */
 	protected void onDoIt(ResultType result, ErrorType e, int type) {
+		setTraggerThreadId();
 		ThreadLocalHolder.setThreadHolder(threadHolder);
 		if (null != sender && needResend(result, e, type)) {
 			sender.doSend(this);
@@ -181,6 +187,15 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 			} catch (Throwable t) {
 				dealException(t);
 			}
+		}
+	}
+
+	/**
+	 * 初次设置触发的threadId
+	 */
+	private void setTraggerThreadId() {
+		if (0 == traggerThreadId) {
+			traggerThreadId = Thread.currentThread().getId();
 		}
 	}
 
@@ -250,7 +265,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 		}
 
 		// 没有combiner则自己完成
-		if (null == serviceChain) {
+		if (null == serviceChain || null == output) {
 			return;
 		}
 		serviceChain.doTask(income, output);
@@ -282,9 +297,8 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 	 * 防止返回太快，还没执行完回调函数就回调了
 	 */
 	protected void loopWaitChain() {
-		// 如果和母线程是同一个的就说明是串行的，没必要等了
-		long id = Thread.currentThread().getId();
-		if (id == motherThreadId) {
+		// 如果触发线程和母线程是同一个的就说明是串行的，没必要等了
+		if (traggerThreadId == motherThreadId) {
 			return;
 		}
 		try {
@@ -294,6 +308,10 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 		} catch (InterruptedException e) {
 			throw new RuntimeException("callback error can not wait service chain and output", e);
 		}
+	}
+
+	public boolean isSyn() {
+		return traggerThreadId == motherThreadId;
 	}
 
 	public boolean isDone() {

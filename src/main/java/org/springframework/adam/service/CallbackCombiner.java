@@ -108,6 +108,17 @@ public class CallbackCombiner<IncomeType, OutputType> extends AbsCallbacker<Obje
 	}
 
 	@Override
+	public boolean isSyn() {
+		for (AbsCallbacker absCallbacker : this.callbacks) {
+			// 如果有一个callback是异步的那说明这个combiner就是异步的
+			if (!absCallbacker.isSyn()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
 	public void dealSuccess(Object result) {
 		// nothing to do
 	}

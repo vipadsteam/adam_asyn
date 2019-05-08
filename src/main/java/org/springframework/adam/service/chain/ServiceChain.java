@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.adam.backpressure.BackPressureUtils;
 import org.springframework.adam.client.ILogService;
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
@@ -235,38 +238,46 @@ public class ServiceChain {
 	/**
 	 * 启动链路调用
 	 * 
-	 * @param income
-	 * @param output
-	 * @param serviceEnum
 	 * @return
 	 */
 	public void doServer(Object income, ResultVo output, String serviceEnum) {
-		doServer(income, output, serviceEnum, 0, false);
+		doServer(income, output, 0, null, serviceEnum, false);
 	}
 
 	/**
 	 * 启动子链路调用
 	 * 
-	 * @param income
-	 * @param output
-	 * @param serviceEnum
 	 * @return
 	 */
 	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, String serviceEnum) {
-		return doServerWithCallback(income, output, serviceEnum, 0);
+		return doServerWithCallback(income, output, 0, serviceEnum);
 	}
 
 	/**
 	 * 启动子链路调用
 	 * 
-	 * @param income
-	 * @param output
-	 * @param serviceEnum
-	 * @param waitSecond
 	 * @return
 	 */
-	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, String serviceEnum, long waitSecond) {
-		return doServer(income, output, serviceEnum, waitSecond, true);
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, long waitSecond, String serviceEnum) {
+		return doServerWithCallback(income, output, waitSecond, null, serviceEnum);
+	}
+
+	/**
+	 * 启动子链路调用
+	 * 
+	 * @return
+	 */
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, Executor tpe, String serviceEnum) {
+		return doServerWithCallback(income, output, 0, tpe, serviceEnum);
+	}
+
+	/**
+	 * 启动子链路调用
+	 * 
+	 * @return
+	 */
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, long waitSecond, Executor tpe, String serviceEnum) {
+		return doServer(income, output, waitSecond, tpe, serviceEnum, true);
 	}
 
 	/**
@@ -277,7 +288,7 @@ public class ServiceChain {
 	 * @param serviceEnum
 	 * @return
 	 */
-	private ServiceChainCallbacker doServer(Object income, ResultVo output, String serviceEnum, long waitSecond, boolean isChildChain) {
+	private ServiceChainCallbacker doServer(Object income, ResultVo output, long waitSecond, Executor tpe, String serviceEnum, boolean isChildChain) {
 		// 检查初始化
 		init();
 		// 获取任务列表
@@ -314,10 +325,12 @@ public class ServiceChain {
 
 		// 正式处理任务
 		if (null == future) {
-			doTask(income, output);
-			// 如果全链都是同步操作则不需要返回scc
-			if (!output.isAsyn()) {
-				return null;
+			// 有线程池加入且是子链的才能异步执行
+			if (null == tpe || !isChildChain || null == scc) {
+				doTask(income, output);
+			} else {
+				// 子链callback不为空
+				asynDo(tpe, income, output);
 			}
 			return scc;
 		} else {
@@ -327,6 +340,25 @@ public class ServiceChain {
 			// 如果future不为空则表明链条聚合
 			future.init(this, income, output);
 			return null;
+		}
+	}
+
+	/**
+	 * 异步执行doTask
+	 * 
+	 * @param tpe
+	 * @param income
+	 * @param output
+	 */
+	private void asynDo(Executor tpe, Object income, ResultVo output) {
+		try {
+			Runnable r = new AsynDoTask(this, income, output);
+			tpe.execute(r);
+		} catch (RejectedExecutionException r) {
+			// 背压通知
+			BackPressureUtils.errIncrease(r);
+			// 如果无法执行子链则由本线程执行
+			doTask(income, output);
 		}
 	}
 
@@ -397,23 +429,21 @@ public class ServiceChain {
 			}
 
 			// 如果返回是空的话说明不用异步，则继续函数嵌套走后面
-			if (null == absCallbacker) {
+			if (null == absCallbacker || absCallbacker.isSyn()) {
 				doTask(income, output);
 				return;
 			} else if (absCallbacker.isCombiner()) {// 如果是combine，callback都为空情况下也和null一样处理
 				CallbackCombiner combiner = (CallbackCombiner) absCallbacker;
-				if (CollectionUtils.isEmpty(combiner.getCallbacks())) {
+				if (CollectionUtils.isEmpty(combiner.getCallbacks()) || combiner.isSyn()) {
 					doTask(income, output);
 					return;
 				} else {
 					// 把东西都设置好，让callback来完成后面的工作
-					output.setAsyn(true);
 					absCallbacker.setChain(this, income, output);
 					return;
 				}
 			} else {
 				// 把东西都设置好，让callback来完成后面的工作
-				output.setAsyn(true);
 				absCallbacker.setChain(this, income, output);
 				return;
 			}
