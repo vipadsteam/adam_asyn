@@ -420,9 +420,11 @@ public class ServiceChain {
 						// 成功的游标向下走
 						AbsTasker taskerNext = (AbsTasker) output.taskerList().get(index + 1);
 						// 如果是service类型不需要判空ServiceInfo
-						int successCursor = taskerNext.getServiceInfo().getOrder();
-						if (successCursor > output.successCursor()) {
-							output.setSuccessCursor(successCursor);
+						if (DoServiceTasker.TYPE.equals(taskerNext.getType())) {
+							int successCursor = taskerNext.getServiceInfo().getOrder();
+							if (successCursor > output.successCursor()) {
+								output.setSuccessCursor(successCursor);
+							}
 						}
 					}
 				}

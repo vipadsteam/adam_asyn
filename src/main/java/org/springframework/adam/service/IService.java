@@ -14,9 +14,7 @@ public interface IService<T1, T2> {
 	 * @throws Exception
 	 *             Exception
 	 */
-	default AbsCallbacker doService(T1 income, ResultVo<T2> output) throws Exception {
-		return null;
-	}
+	public AbsCallbacker doService(T1 income, ResultVo<T2> output) throws Exception;
 
 	/**
 	 * doSuccess 成功服务

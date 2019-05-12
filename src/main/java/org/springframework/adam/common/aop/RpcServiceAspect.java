@@ -108,10 +108,16 @@ public class RpcServiceAspect {
 	}
 
 	private Object doBefore(String url, Map<String, String> headersMap, Object[] income, Object output) throws Exception {
-		return requestHook.doBefore(url, headersMap, income, output);
+		if (null != requestHook) {
+			return requestHook.doBefore(url, headersMap, income, output);
+		}
+		return null;
 	}
 
 	private Object doAfter(String url, Map<String, String> headersMap, Object[] income, Object output) throws Exception {
-		return requestHook.doAfter(url, headersMap, income, output);
+		if (null != requestHook) {
+			return requestHook.doAfter(url, headersMap, income, output);
+		}
+		return output;
 	}
 }

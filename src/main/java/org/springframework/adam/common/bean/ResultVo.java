@@ -145,19 +145,15 @@ public class ResultVo<T> implements Serializable {
 			setResultCode(resultCode);
 			return;
 		}
-		if (!ResultVo.ForceSet.class.equals(thisClass)) {
-			ServiceErrorCode errorCode = thisClass.getAnnotation(ServiceErrorCode.class);
-			if (null != errorCode) {
-				if (BaseReslutCodeConstants.CODE_NOT_SUPPORT.equals(errorCode.value())) {
-					return;
+		ServiceErrorCode errorCode = thisClass.getAnnotation(ServiceErrorCode.class);
+		if (null != errorCode && StringUtils.isNotBlank(errorCode.value())) {
+			if (BaseReslutCodeConstants.CODE_NOT_SUPPORT.equals(errorCode.value())) {
+				return;
+			}
+			if (!resultCode.startsWith(errorCode.value()) && !success() && !resultCode.startsWith(BaseReslutCodeConstants.CODE_ERROR_BUT_CONTINUE)) {
+				if (!ServiceChain.class.equals(thisClass)) {
+					log.warn(resultCode + "错误代码要以" + errorCode.value() + "开头");
 				}
-				if (!resultCode.startsWith(errorCode.value()) && !success() && !resultCode.startsWith(BaseReslutCodeConstants.CODE_ERROR_BUT_CONTINUE)) {
-					if (!ServiceChain.class.equals(thisClass)) {
-						log.warn(resultCode + "错误代码要以" + errorCode.value() + "开头");
-					}
-				}
-			} else {
-				log.warn("类" + thisClass.getSimpleName() + "要设置@ServiceErrorCode注解规范错误代码");
 			}
 		}
 		setResultCode(resultCode);
@@ -247,10 +243,6 @@ public class ResultVo<T> implements Serializable {
 	@Override
 	public String toString() {
 		return "ResultVo [resultCode=" + resultCode + ", resultMsg=" + resultMsg + ", data=" + JSON.toJSONString(data) + "]";
-	}
-
-	public static class ForceSet {
-
 	}
 
 	public boolean finished() {

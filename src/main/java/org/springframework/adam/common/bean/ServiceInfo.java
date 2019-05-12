@@ -3,6 +3,7 @@
  */
 package org.springframework.adam.common.bean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
 import org.springframework.adam.common.bean.annotation.service.ServiceOrder;
 import org.springframework.adam.common.utils.AdamClassUtils;
@@ -22,7 +23,7 @@ public class ServiceInfo<T1, T2> {
 
 	private int order;
 
-	private String errorCode;
+	private String errorCode = "";
 
 	public ServiceInfo(IService service) {
 		super();
@@ -34,7 +35,9 @@ public class ServiceInfo<T1, T2> {
 			ServiceOrder order = (ServiceOrder) clazz.getAnnotation(ServiceOrder.class);
 			this.order = order.value();
 			ServiceErrorCode errorCode = (ServiceErrorCode) clazz.getAnnotation(ServiceErrorCode.class);
-			this.errorCode = errorCode.value();
+			if (null != errorCode && StringUtils.isNotBlank(errorCode.value())) {
+				this.errorCode = errorCode.value();
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(className + " error:", e);
 		}
