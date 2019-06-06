@@ -1,6 +1,9 @@
 package org.springframework.adam.common.utils.context;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.adam.service.chain.ServiceChain;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.stereotype.Service;
@@ -76,6 +83,43 @@ public class SpringContextUtils implements InitializingBean {
 	}
 
 	/**
+	 * 
+	 * @param class
+	 *            注册class
+	 * @param serviceName
+	 *            注册别名
+	 * @param propertyMap
+	 *            注入属性
+	 * @param app
+	 *            application上下文
+	 */
+	public static void addBean(Class<?> clazz, String serviceName, Map<?, ?> propertyMap) {
+		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
+		if (propertyMap != null) {
+			Iterator<?> entries = propertyMap.entrySet().iterator();
+			Map.Entry<?, ?> entry;
+			while (entries.hasNext()) {
+				entry = (Map.Entry<?, ?>) entries.next();
+				String key = (String) entry.getKey();
+				Object val = entry.getValue();
+				beanDefinitionBuilder.addPropertyValue(key, val);
+			}
+		}
+		registerBean(serviceName, beanDefinitionBuilder.getRawBeanDefinition());
+	}
+
+	/**
+	 * @desc 向spring容器注册bean
+	 * @param beanName
+	 * @param beanDefinition
+	 */
+	private static void registerBean(String beanName, BeanDefinition beanDefinition) {
+		ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
+		BeanDefinitionRegistry beanDefinitonRegistry = (BeanDefinitionRegistry) configurableApplicationContext.getBeanFactory();
+		beanDefinitonRegistry.registerBeanDefinition(beanName, beanDefinition);
+	}
+
+	/**
 	 * 检查ApplicationContext不为空.
 	 */
 	private static void assertContextInjected() {
@@ -132,7 +176,6 @@ public class SpringContextUtils implements InitializingBean {
 		assertContextInjected();
 		return applicationContext.getBeanNamesForType(clazz);
 	}
-	
 
 	/**
 	 * getSpringBeansByType 根据类型获取SpringBean
@@ -144,10 +187,10 @@ public class SpringContextUtils implements InitializingBean {
 	public static <T> T getSpringBeanByType(Class<?> clazz) {
 		assertContextInjected();
 		String[] names = applicationContext.getBeanNamesForType(clazz);
-		if(null == names || names.length == 0){
+		if (null == names || names.length == 0) {
 			return null;
 		}
-		if(StringUtils.isBlank(names[0])){
+		if (StringUtils.isBlank(names[0])) {
 			return null;
 		}
 
@@ -176,7 +219,7 @@ public class SpringContextUtils implements InitializingBean {
 		}
 
 		SpringContextUtils.applicationContext = applicationContextTmp; // NOSONAR
-		
+
 		ServiceChain serviceChain = applicationContext.getBean(ServiceChain.class);
 		serviceChain.init();
 	}

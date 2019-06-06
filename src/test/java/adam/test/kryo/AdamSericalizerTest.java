@@ -5,7 +5,7 @@ package adam.test.kryo;
 
 import java.io.IOException;
 
-import org.junit.runner.Result;
+import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.serialzer.AdamSerializeFactory;
 import org.springframework.adam.common.serialzer.AdamSerializer;
 
@@ -23,7 +23,7 @@ public class AdamSericalizerTest {
 		String str = "Aa你好啊，～！#￥）%￥@×》《/";
 		byte[] strBytes = AdamSerializer.instance(new AdamSerializeFactory()).serialize(str);
 		System.out.println(AdamSerializer.instance().deserialize(strBytes, String.class));
-		LogBean l = new LogBean(str, new Result(), new Result(), "hello");
+		LogBean l = new LogBean(str, new ResultVo(), new ResultVo(), "hello");
 		strBytes = AdamSerializer.instance().serialize(l);
 		System.out.println(AdamSerializer.instance().deserialize(strBytes, LogBean.class).getRunningAccount());
 
