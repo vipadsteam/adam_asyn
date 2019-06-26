@@ -6,14 +6,11 @@ package adam.test.bean.map;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.plugins.bmp.BMPImageWriteParam;
-
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.map.AdamBeanMapper;
 
 import com.alibaba.fastjson.JSON;
 
-import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.TypeBuilder;
 
 /**
