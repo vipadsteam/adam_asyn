@@ -171,7 +171,7 @@ public class AdamRuleExcutor {
 		List<SyntaxNode> syntaxNodes = new ArrayList<SyntaxNode>();
 		String tmpCondition = condition;
 		// 保护数字，如果节点超过100个则无法计算，避免死循环
-		int protectNum = 100;
+		int protectNum = 1000;
 		// 循环临时条件
 		while (!StringUtils.isBlank(tmpCondition) && protectNum >= 0) {
 			protectNum--;

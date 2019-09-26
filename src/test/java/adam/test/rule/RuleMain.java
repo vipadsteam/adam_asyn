@@ -44,15 +44,15 @@ public class RuleMain {
 	 */
 	public static void main(String[] args) {
 		AdamRuleExcutor r = new AdamRuleExcutor();
-		AdsCache cache = new AdsCache();
-		cache.refresh("30");
-		r.setRuleCache(cache);
-		System.out.println(r.execute(RULE_STR, ruleMap));
+//		AdsCache cache = new AdsCache();
+//		cache.refresh("30");
+//		r.setRuleCache(cache);
+//		System.out.println(r.execute(RULE_STR, ruleMap));
 		
 		Map<String, String> ruleMap = new HashMap<String, String>();
-		ruleMap.put("[10.1.115.32]", "1");
-		ruleMap.put("[local_proxy]", "1");
-		System.out.println(r.execute("([10.1.115.32] & [local_proxy])", ruleMap));
+		ruleMap.put("[10.1.115.33]", "1");
+		ruleMap.put("[remote_proxy]", "1");
+		System.out.println(r.execute("[local_proxy]|[10.1.115.33]", ruleMap));
 
 //		RuleMain rm = new RuleMain();
 //		while (true) {
