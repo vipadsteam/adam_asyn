@@ -14,10 +14,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.adam.common.ICache;
 import org.springframework.adam.common.rule.bean.CalculNode;
 import org.springframework.adam.common.rule.bean.SyntaxNode;
 import org.springframework.adam.common.rule.bean.SyntaxToken;
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,14 +35,15 @@ public class AdamRuleExcutor {
 	
 	private static final String LIST_SUFF = "_l";
 
-	private Cache ruleCache;
+	private ICache ruleCache;
 
-	public Cache getRuleCache() {
+	public ICache getRuleCache() {
 		return ruleCache;
 	}
 
-	public void setRuleCache(Cache ruleCache) {
+	public AdamRuleExcutor setRuleCache(ICache ruleCache) {
 		this.ruleCache = ruleCache;
+		return this;
 	}
 
 	/**
@@ -97,6 +98,7 @@ public class AdamRuleExcutor {
 	 * @return
 	 */
 	private Map<String, String> getBracketsNode(String condition) {
+		condition = condition.replace(" ", "");
 		int leftCount = getLeftBracketsCount(condition);
 		Map<String, String> bracketsMap = new LinkedHashMap<String, String>(leftCount + 1);
 		int bracketIndex = 0;

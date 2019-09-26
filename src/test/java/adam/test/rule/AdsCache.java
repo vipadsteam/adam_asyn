@@ -6,6 +6,7 @@ package adam.test.rule;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.adam.common.ICache;
 import org.springframework.cache.Cache;
 
 import com.google.common.cache.CacheBuilder;
@@ -14,7 +15,7 @@ import com.google.common.cache.CacheBuilder;
  * @author USER
  *
  */
-public class AdsCache extends CommonLocalCache implements Cache {
+public class AdsCache extends CommonLocalCache implements Cache, ICache{
 
 	/*
 	 * (non-Javadoc)

@@ -49,6 +49,11 @@ public class RuleMain {
 		cache.refresh("30");
 		r.setRuleCache(cache);
 		System.out.println(r.execute(RULE_STR, ruleMap));
+		
+		Map<String, String> ruleMap = new HashMap<String, String>();
+		ruleMap.put("[10.1.115.32]", "1");
+		ruleMap.put("[local_proxy]", "1");
+		System.out.println(r.execute("([10.1.115.32] & [local_proxy])", ruleMap));
 
 //		RuleMain rm = new RuleMain();
 //		while (true) {
