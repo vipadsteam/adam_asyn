@@ -23,6 +23,12 @@ public class LocalIpHolder {
 
 	private volatile static String localIp = null;
 
+	private volatile static String pid = null;
+
+	public static String getInstanceId() {
+		return getIp() + getPid();
+	}
+
 	public static String getIp() {
 		if (StringUtils.isBlank(localIp)) {
 			try {
@@ -55,8 +61,23 @@ public class LocalIpHolder {
 			thisIp = InetAddress.getLocalHost().getHostAddress();
 		}
 
-		String pid = ManagementFactory.getRuntimeMXBean().getName();
-		localIp = thisIp + "_" + pid;
+		localIp = thisIp;
+	}
+
+	public static String getPid() {
+		if (StringUtils.isBlank(pid)) {
+			try {
+				initPid();
+			} catch (Exception e) {
+				log.error(e, e);
+			}
+		}
+
+		return pid;
+	}
+
+	private static void initPid() {
+		pid = ManagementFactory.getRuntimeMXBean().getName();
 	}
 
 }

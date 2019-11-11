@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework</groupId>
 	<artifactId>adam_asyn</artifactId>
-	<version>3.0.2-SNAPSHOT</version>
+	<version>3.0.3-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -12,19 +12,6 @@
 
 	<dependencies>
 		<!-- <dependency> <groupId>io.netty</groupId> <artifactId>netty-all</artifactId> <version>4.1.31.Final</version> </dependency> -->
-		<!-- test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- spring -->
 		<dependency>
@@ -236,15 +223,13 @@
 		<repository>
 			<id>nexus</id>
 			<name>Search Book Replace Plugin</name>
-			<url>http://ads-server:8081/nexus/content/repositories/releases/</url>
+			<url>http://164.90.77.175:8081/repository/maven-releases/</url>
 		</repository>
 		<!-- use the following if you ARE using a snapshot version. -->
 		<snapshotRepository>
 			<id>snapshots</id>
 			<name>Search Book Replace Plugin</name>
-			<!-- <url>http://mvn1.tools.vipshop.com/nexus/content/repositories/snapshots/</url> -->
-			<url>http://nexus.fanxing.kgidc.cn/nexus/content/repositories/snapshots/</url>
-			<!-- <url>http://nexus.tools.vip.com/nexus/content/repositories/snapshots/</url> -->
+			<url>http://164.90.77.175:8081/repository/maven-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
