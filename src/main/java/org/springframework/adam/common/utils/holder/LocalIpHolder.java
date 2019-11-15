@@ -29,6 +29,10 @@ public class LocalIpHolder {
 		return getIp() + getPid();
 	}
 
+	public static void setIP(String ip) {
+		localIp = ip;
+	}
+	
 	public static String getIp() {
 		if (StringUtils.isBlank(localIp)) {
 			try {

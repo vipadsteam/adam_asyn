@@ -162,4 +162,35 @@ public class RequestLogEntity implements Serializable {
 		this.runningAccount = runningAccount;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder(1024);
+		builder.append("RequestLogEntity [id=");
+		builder.append(id);
+		builder.append(", runningAccount=");
+		builder.append(runningAccount);
+		builder.append(", url=");
+		builder.append(url);
+		builder.append(", header=");
+		builder.append(header);
+		builder.append(", request=");
+		builder.append(request);
+		builder.append(", response=");
+		builder.append(response);
+		builder.append(", inputName=");
+		builder.append(inputName);
+		builder.append(", createTimeStr=");
+		builder.append(createTimeStr);
+		builder.append(", createTimeLong=");
+		builder.append(createTimeLong);
+		builder.append(", ip=");
+		builder.append(ip);
+		builder.append(", threadName=");
+		builder.append(threadName);
+		builder.append(", useTime=");
+		builder.append(useTime);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

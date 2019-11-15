@@ -44,7 +44,7 @@ public class RedisCore {
 	}
 
 	private synchronized void jedisInit() {
-		String redisConnect = "10.199.199.135:7000,10.199.199.135:7001,10.199.199.135:7002,10.199.199.135:7003,10.199.199.135:7004,10.199.199.135:7005";
+		String redisConnect = "1.196.79.131:6546";
 		String maxTotalStr = "20";
 		int maxTotal = 5;
 		if (StringUtils.isNumeric(maxTotalStr)) {
@@ -68,7 +68,7 @@ public class RedisCore {
 		}
 		GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
 		poolConfig.setMaxTotal(maxTotal);
-		JedisCluster jc = new JedisCluster(jedisClusterNodes, 2000, poolConfig);
+		JedisCluster jc = new JedisCluster(jedisClusterNodes, 2000, 2000, 3, "bg1123448", poolConfig);
 		return jc;
 	}
 }

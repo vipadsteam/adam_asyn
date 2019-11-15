@@ -50,8 +50,8 @@ public class RuleMain {
 //		System.out.println(r.execute(RULE_STR, ruleMap));
 		
 		Map<String, String> ruleMap = new HashMap<String, String>();
-		ruleMap.put("[10.1.115.33]", "1");
-		ruleMap.put("[remote_proxy]", "1");
+		ruleMap.put("[10.1.115.33]", "0");
+		ruleMap.put("[remote_proxy]", "0");
 		System.out.println(r.execute("[local_proxy]|[10.1.115.33]", ruleMap));
 
 //		RuleMain rm = new RuleMain();
