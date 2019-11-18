@@ -29,13 +29,18 @@ public class LocalIpHolder {
 
 	public static String getInstanceId() {
 		if (null == instanceId) {
-			instanceId = getIp() + ":" + getPid();
+			instanceId = getInstanceId(getIp(), getPid());
 		}
 		return instanceId;
 	}
 
 	public static void setIP(String ip) {
 		localIp = ip;
+		instanceId = getInstanceId(ip, getPid());
+	}
+
+	private static String getInstanceId(String ip, String pid) {
+		return ip + ":" + pid;
 	}
 
 	public static String getIp() {
