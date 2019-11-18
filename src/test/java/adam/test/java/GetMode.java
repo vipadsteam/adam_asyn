@@ -18,7 +18,7 @@ public class GetMode {
 	 */
 	public static void main(String[] args) {
 		for (int i = 0; i < 10000; i++) {
-			System.out.println(idx.getAndIncrement() & 8 - 1);
+			System.out.println(idx.getAndIncrement() & 32 - 1);
 		}
 	}
 
