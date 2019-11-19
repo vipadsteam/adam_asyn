@@ -33,14 +33,29 @@ public class AdamTimeUtil implements InitializingBean {
 
 	private static AtomicLong idx = new AtomicLong(0);
 
+	/**
+	 * 当前时间
+	 * 
+	 * @return
+	 */
 	public static long getNow() {
 		return now;
 	}
 
+	/**
+	 * 当前时间片刻的index
+	 * 
+	 * @return
+	 */
 	public static long getNowIndex() {
 		return idx.getAndIncrement();
 	}
 
+	/**
+	 * 被重置了多少次
+	 * 
+	 * @return
+	 */
 	public static long getResetCount() {
 		return count;
 	}
@@ -59,15 +74,14 @@ public class AdamTimeUtil implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() {
-		ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(2,
+		ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(1,
 				new AdamThreadFactory("adam_time_util"));
 		scheduleThreadPool.scheduleAtFixedRate(() -> {
 			old = now;
 			now = System.currentTimeMillis();
 			if (old > now) {
 				// 服务器时间被重置过
-				count++;
-				count = Math.max(count, 9);
+				count = Math.max(++count, 9);
 			}
 			idx.set(0);
 		}, 0, 1, TimeUnit.MILLISECONDS);
