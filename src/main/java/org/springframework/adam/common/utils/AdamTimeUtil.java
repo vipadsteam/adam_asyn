@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.adam.common.factory.AdamThreadFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,7 +32,7 @@ public class AdamTimeUtil implements InitializingBean {
 
 	private volatile static long now = 0l;
 
-	private static AtomicLong idx = new AtomicLong(0);
+	private volatile static AtomicLong idx = new AtomicLong(0);
 
 	/**
 	 * 当前时间
@@ -51,7 +52,7 @@ public class AdamTimeUtil implements InitializingBean {
 	 * @return
 	 */
 	public static long getNowIndex() {
-		return idx.getAndIncrement();
+		return idx.getAndAdd(2);
 	}
 
 	/**
@@ -81,14 +82,24 @@ public class AdamTimeUtil implements InitializingBean {
 		}
 		ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(1,
 				new AdamThreadFactory("adam_time_util"));
-		scheduleThreadPool.scheduleAtFixedRate(() -> {
-			old = now;
-			now = System.currentTimeMillis();
-			if (old > now) {
+		scheduleThreadPool.scheduleWithFixedDelay(() -> {
+			long nowTmp = System.currentTimeMillis();
+			// 时间没更新不用管
+			if (nowTmp == now) {
+				return;
+			}
+			if (old > nowTmp) {
 				// 服务器时间被重置过
 				count = Math.max(++count, 9);
 			}
-			idx.set(0);
+			old = now;
+			now = nowTmp;
+			// 奇数偶数互换，上一次用奇数，这一次就用偶数，
+			if (idx.get() % 2 == 1) {
+				idx.set(0);
+			} else {
+				idx.set(1);
+			}
 		}, 0, 1, TimeUnit.MILLISECONDS);
 		now = System.currentTimeMillis();
 	}
