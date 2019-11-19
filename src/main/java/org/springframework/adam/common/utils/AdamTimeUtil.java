@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.adam.common.factory.AdamThreadFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,8 +31,14 @@ public class AdamTimeUtil implements InitializingBean {
 
 	private volatile static long now = System.currentTimeMillis();
 
+	private static AtomicLong idx = new AtomicLong(0);
+
 	public static long getNow() {
 		return now;
+	}
+
+	public static long getNowIndex() {
+		return idx.getAndIncrement();
 	}
 
 	public static long getResetCount() {
@@ -51,10 +58,10 @@ public class AdamTimeUtil implements InitializingBean {
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(1,
+	public void afterPropertiesSet() {
+		ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(2,
 				new AdamThreadFactory("adam_time_util"));
-		scheduleThreadPool.scheduleWithFixedDelay(() -> {
+		scheduleThreadPool.scheduleAtFixedRate(() -> {
 			old = now;
 			now = System.currentTimeMillis();
 			if (old > now) {
@@ -62,11 +69,21 @@ public class AdamTimeUtil implements InitializingBean {
 				count++;
 				count = Math.max(count, 9);
 			}
+			idx.set(0);
 		}, 0, 1, TimeUnit.MILLISECONDS);
-		scheduleThreadPool.shutdown();
 	}
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws Exception {
+		AdamTimeUtil a = new AdamTimeUtil();
+		a.afterPropertiesSet();
+		System.out.println("a--" + getNow());
 		System.out.println(stringToDate("1999-05-03 16:33:11"));
+		Thread.sleep(1000);
+		System.out.println("b--" + getNow());
+		Thread.sleep(2000);
+		for (int i = 0; i < 1000; i++) {
+			Thread.sleep(10);
+			System.out.println(i + "--" + getNow());
+		}
 	}
 }
