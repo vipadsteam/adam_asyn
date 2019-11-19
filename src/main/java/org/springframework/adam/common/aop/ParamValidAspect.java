@@ -22,7 +22,7 @@ import org.springframework.adam.common.bean.annotation.service.ParamNotNull;
 import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
 import org.springframework.adam.common.bean.contants.BaseReslutCodeConstants;
 import org.springframework.adam.common.utils.AdamClassUtils;
-import org.springframework.adam.common.utils.AdamDateUtil;
+import org.springframework.adam.common.utils.AdamTimeUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -107,7 +107,7 @@ public class ParamValidAspect {
 				} else if (Double.class.equals(field.getGenericType())) {
 					field.set(argument, Double.valueOf(defaultVal));
 				} else if (Date.class.equals(field.getGenericType())) {
-					field.set(argument, AdamDateUtil.stringToDate(defaultVal));
+					field.set(argument, AdamTimeUtil.stringToDate(defaultVal));
 				} else if (Boolean.class.equals(field.getGenericType())) {
 					if ("true".equals(defaultVal) || "Y".equals(defaultVal)) {
 						field.set(argument, Boolean.TRUE);
