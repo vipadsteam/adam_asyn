@@ -29,7 +29,7 @@ public class AdamTimeUtil implements InitializingBean {
 
 	private volatile static long old = 0l;
 
-	private volatile static long now = System.currentTimeMillis();
+	private volatile static long now = 0l;
 
 	private static AtomicLong idx = new AtomicLong(0);
 
@@ -39,6 +39,9 @@ public class AdamTimeUtil implements InitializingBean {
 	 * @return
 	 */
 	public static long getNow() {
+		if (0 == now) {
+			init();
+		}
 		return now;
 	}
 
@@ -72,8 +75,10 @@ public class AdamTimeUtil implements InitializingBean {
 		return dateFormatter.get().parse(dateStr);
 	}
 
-	@Override
-	public void afterPropertiesSet() {
+	private synchronized static void init() {
+		if (now > 0) {
+			return;
+		}
 		ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(1,
 				new AdamThreadFactory("adam_time_util"));
 		scheduleThreadPool.scheduleAtFixedRate(() -> {
@@ -85,11 +90,15 @@ public class AdamTimeUtil implements InitializingBean {
 			}
 			idx.set(0);
 		}, 0, 1, TimeUnit.MILLISECONDS);
+		now = System.currentTimeMillis();
+	}
+
+	@Override
+	public void afterPropertiesSet() {
+		init();
 	}
 
 	public static void main(String[] args) throws Exception {
-		AdamTimeUtil a = new AdamTimeUtil();
-		a.afterPropertiesSet();
 		System.out.println("a--" + getNow());
 		System.out.println(stringToDate("1999-05-03 16:33:11"));
 		Thread.sleep(1000);
