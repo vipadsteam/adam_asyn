@@ -111,7 +111,8 @@ public class ResultVo<T> implements Serializable {
 	 * @param orig
 	 * @param defaultData
 	 */
-	public void copyResult(Class<? extends Object> thisClass, String thisResultCode, String thisMessage, ResultVo orig, T defaultData) {
+	public void copyResult(Class<? extends Object> thisClass, String thisResultCode, String thisMessage, ResultVo orig,
+			T defaultData) {
 		this.setResultCode(thisClass, thisResultCode + orig.getResultCode());
 		this.setResultMsg(orig.getResultMsg());
 		if (null != defaultData) {
@@ -141,7 +142,8 @@ public class ResultVo<T> implements Serializable {
 	 * @param resultCode
 	 */
 	public void setResultCode(Class<? extends Object> thisClass, String resultCode) {
-		if (BaseReslutCodeConstants.CODE_SUCCESS.equals(resultCode) || BaseReslutCodeConstants.CODE_SUCCESS_AND_BREAK.equals(resultCode)) {
+		if (BaseReslutCodeConstants.CODE_SUCCESS.equals(resultCode)
+				|| BaseReslutCodeConstants.CODE_SUCCESS_AND_BREAK.equals(resultCode)) {
 			setResultCode(resultCode);
 			return;
 		}
@@ -150,7 +152,8 @@ public class ResultVo<T> implements Serializable {
 			if (BaseReslutCodeConstants.CODE_NOT_SUPPORT.equals(errorCode.value())) {
 				return;
 			}
-			if (!resultCode.startsWith(errorCode.value()) && !success() && !resultCode.startsWith(BaseReslutCodeConstants.CODE_ERROR_BUT_CONTINUE)) {
+			if (!resultCode.startsWith(errorCode.value()) && !success()
+					&& !resultCode.startsWith(BaseReslutCodeConstants.CODE_ERROR_BUT_CONTINUE)) {
 				if (!ServiceChain.class.equals(thisClass)) {
 					log.warn(resultCode + "错误代码要以" + errorCode.value() + "开头");
 				}
@@ -165,7 +168,8 @@ public class ResultVo<T> implements Serializable {
 	 * @return
 	 */
 	public boolean success() {
-		if (BaseReslutCodeConstants.CODE_SUCCESS.equals(resultCode) || BaseReslutCodeConstants.CODE_SUCCESS_AND_BREAK.equals(resultCode)) {
+		if (BaseReslutCodeConstants.CODE_SUCCESS.equals(resultCode)
+				|| BaseReslutCodeConstants.CODE_SUCCESS_AND_BREAK.equals(resultCode)) {
 			return true;
 		}
 		return false;
@@ -177,7 +181,8 @@ public class ResultVo<T> implements Serializable {
 	 * @return
 	 */
 	public boolean isContinue() {
-		if (BaseReslutCodeConstants.CODE_SUCCESS.equals(resultCode) || BaseReslutCodeConstants.CODE_ERROR_BUT_CONTINUE.equals(resultCode)) {
+		if (BaseReslutCodeConstants.CODE_SUCCESS.equals(resultCode)
+				|| BaseReslutCodeConstants.CODE_ERROR_BUT_CONTINUE.equals(resultCode)) {
 			return true;
 		}
 		return false;
@@ -189,6 +194,18 @@ public class ResultVo<T> implements Serializable {
 
 	public String getResultMsg() {
 		return resultMsg;
+	}
+
+	public String getSimpleResultMsg(int length) {
+		if (StringUtils.isBlank(resultMsg)) {
+			return resultMsg;
+		}
+		int index = resultMsg.indexOf(":");
+		if (index > 0) {
+			length = index;
+		}
+		String tmp = resultMsg.substring(0, Math.min(length, resultMsg.length()));
+		return tmp;
 	}
 
 	/**
@@ -242,7 +259,8 @@ public class ResultVo<T> implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ResultVo [resultCode=" + resultCode + ", resultMsg=" + resultMsg + ", data=" + JSON.toJSONString(data) + "]";
+		return "ResultVo [resultCode=" + resultCode + ", resultMsg=" + resultMsg + ", data=" + JSON.toJSONString(data)
+				+ "]";
 	}
 
 	public boolean finished() {

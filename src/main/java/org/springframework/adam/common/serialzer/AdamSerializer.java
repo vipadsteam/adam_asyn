@@ -106,7 +106,7 @@ public class AdamSerializer {
 		if (nowIndex > 100000000) {
 			index = 0;
 		}
-		int i = nowIndex % LIST_SIZE;
+		int i = nowIndex & LIST_SIZE - 1;
 
 		// 当前线程是否init了，如果否则等待初始化
 		if (!myInited) {

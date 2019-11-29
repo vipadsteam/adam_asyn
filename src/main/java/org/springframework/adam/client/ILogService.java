@@ -2,7 +2,6 @@ package org.springframework.adam.client;
 
 import java.net.UnknownHostException;
 
-import org.springframework.adam.common.bean.RequestLogEntity;
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.utils.AdamExceptionUtils;
 
@@ -24,23 +23,11 @@ public interface ILogService {
 	}
 
 	/**
-	 * 技术异常日志
-	 * 
-	 * @param income
-	 * @param output
-	 * @param methodName
-	 * @param remark
-	 */
-	default void sendTechnologyErrorAccountLog(Object income, Object output, String methodName, String remark) {
-		return;
-	}
-
-	/**
 	 * 请求开始日志
 	 * 
 	 * @param obj
 	 */
-	default void sendBeginRequestLog(RequestLogEntity obj) {
+	default void sendBeginRequestLog(Object obj) {
 		return;
 	}
 
@@ -49,7 +36,7 @@ public interface ILogService {
 	 * 
 	 * @param obj
 	 */
-	default void sendEndRequestLog(RequestLogEntity obj) {
+	default void sendEndRequestLog(Object obj) {
 		return;
 	}
 
