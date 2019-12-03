@@ -131,7 +131,7 @@ public abstract class AbsTasker<T1, T2> {
 					output.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_900000);
 				}
 			}
-			output.setResultMsg("system error occor:" + AdamExceptionUtils.getStackTrace(e));
+			output.setResultMsg("system error occur:" + AdamExceptionUtils.getStackTrace(e));
 			// 不能放finally，要不然resultCode就不是真实的
 		} finally {
 			addEndLog(income, output, begin);

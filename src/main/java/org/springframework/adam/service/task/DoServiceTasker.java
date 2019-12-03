@@ -41,7 +41,7 @@ public class DoServiceTasker<T1, T2> extends AbsTasker<T1, T2> {
 			log.error(this.getServiceInfo().getSimpleClassName() + "." + TYPE + " error occor:", t);
 			// doservice的任务并且任务内部都是成功的才设置成框架的error
 			output.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_900000);
-			output.setResultMsg("adam system error occor:" + AdamExceptionUtils.getStackTrace(t));
+			output.setResultMsg("adam system error occur:" + AdamExceptionUtils.getStackTrace(t));
 		}finally{
 			output.setLatestServiceName(this.serviceInfo.getClassName());
 		}

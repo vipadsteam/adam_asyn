@@ -38,7 +38,7 @@ public class DoFailTasker<T1, T2> extends AbsTasker<T1, T2> {
 			result = exc(income, output, false);
 		} catch (Throwable t) {
 			log.error(this.getServiceInfo().getSimpleClassName() + "." + TYPE + " error occor:", t);
-			output.setResultMsg("adam system error occor:" + AdamExceptionUtils.getStackTrace(t));
+			output.setResultMsg("adam system error occur:" + AdamExceptionUtils.getStackTrace(t));
 		}
 		return result;
 	}

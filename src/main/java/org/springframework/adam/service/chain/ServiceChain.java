@@ -385,8 +385,8 @@ public class ServiceChain {
 					future.workNext();
 				} catch (Throwable t) {
 					// 非常严重的异常
-					log.error("adam future system error occor:", t);
-					output.setResultMsg("adam future system error occor:" + AdamExceptionUtils.getStackTrace(t));
+					log.error("adam future system error occur:", t);
+					output.setResultMsg("adam future system error occur:" + AdamExceptionUtils.getStackTrace(t));
 				}
 			}
 			return;
@@ -452,12 +452,12 @@ public class ServiceChain {
 
 		} catch (Throwable t) {
 			// 非常严重的异常
-			log.error("adam system error occor:", t);
+			log.error("adam system error occur:", t);
 			// 如果是doservice的任务并且任务内部都是成功的才设置成框架的error
 			if (output.success() && DoServiceTasker.TYPE.equals(tasker.getType())) {
 				output.setResultCode(this.getClass(), BaseReslutCodeConstants.CODE_900000);
 			}
-			output.setResultMsg("adam system error occor:" + AdamExceptionUtils.getStackTrace(t));
+			output.setResultMsg("adam system error occur:" + AdamExceptionUtils.getStackTrace(t));
 		}
 
 		return;
