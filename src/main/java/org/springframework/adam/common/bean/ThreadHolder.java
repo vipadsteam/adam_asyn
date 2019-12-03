@@ -60,10 +60,21 @@ public class ThreadHolder {
 	}
 
 	public void copy(ThreadHolder threadHolder) {
+		this.begin = threadHolder.getBegin();
 		this.runningAccountId = threadHolder.getRunningAccountId();
 		this.runningAccountFlag = threadHolder.getRunningAccountFlag();
 		this.requestLogFlag = threadHolder.getRequestLogFlag();
 		this.remark = threadHolder.getRemark();
+	}
+
+	public ThreadHolder clone() {
+		ThreadHolder th = new ThreadHolder();
+		th.setBegin(this.begin);
+		th.setRunningAccountId(this.runningAccountId);
+		th.setRunningAccountFlag(this.runningAccountFlag);
+		th.setRequestLogFlag(this.requestLogFlag);
+		th.setRemark(this.remark);
+		return th;
 	}
 
 	public void append(ThreadHolder threadHolder) {
@@ -72,8 +83,19 @@ public class ThreadHolder {
 
 	@Override
 	public String toString() {
-		return "ThreadHolder [runningAccountId=" + runningAccountId + ", runningAccountFlag=" + runningAccountFlag
-				+ ", requestLogFlag=" + requestLogFlag + ", remark=" + remark + "]";
+		StringBuilder builder = new StringBuilder(512);
+		builder.append("ThreadHolder [begin=");
+		builder.append(begin);
+		builder.append(", runningAccountId=");
+		builder.append(runningAccountId);
+		builder.append(", runningAccountFlag=");
+		builder.append(runningAccountFlag);
+		builder.append(", requestLogFlag=");
+		builder.append(requestLogFlag);
+		builder.append(", remark=");
+		builder.append(remark);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

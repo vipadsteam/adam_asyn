@@ -70,11 +70,11 @@ public class RpcServiceAspect {
 				StringBuilder argSB = new StringBuilder(2048);
 				argSB.append("method:");
 				argSB.append(methodName);
-				argSB.append(AdamSysConstants.LINE_SEPARATOR);
+				argSB.append(AdamSysConstants.COLUMN_SPE);
 				for (Object arg : args) {
 					argSB.append(arg + ":");
 					argSB.append(ILogService.obj2Str(arg));
-					argSB.append(AdamSysConstants.LINE_SEPARATOR);
+					argSB.append(AdamSysConstants.COLUMN_SPE);
 				}
 				logService.sendBeginRequestLog(argSB.toString());
 			}
@@ -84,7 +84,7 @@ public class RpcServiceAspect {
 			returnValue = doAfter(methodName, null, args, returnValue);
 		} catch (Throwable t) {
 			long endTime = System.currentTimeMillis();
-			logger.error("RA:" + runningAccount + " " + "Method [" + methodName + "] " + AdamSysConstants.LINE_SEPARATOR
+			logger.error("RA:" + runningAccount + " " + "Method [" + methodName + "] " + AdamSysConstants.COLUMN_SPE
 					+ "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:"
 					+ (endTime - ThreadLocalHolder.getBegin()) + t, t);
 			throw t;
@@ -93,7 +93,7 @@ public class RpcServiceAspect {
 				StringBuilder argSB = new StringBuilder(2048);
 				argSB.append("used time:");
 				argSB.append(AdamTimeUtil.getNow() - ThreadLocalHolder.getBegin());
-				argSB.append(AdamSysConstants.LINE_SEPARATOR);
+				argSB.append(AdamSysConstants.COLUMN_SPE);
 				argSB.append(ILogService.obj2Str(returnValue));
 				logService.sendEndRequestLog(argSB);
 			}
