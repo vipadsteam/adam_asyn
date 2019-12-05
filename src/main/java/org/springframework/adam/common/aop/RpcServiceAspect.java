@@ -89,13 +89,15 @@ public class RpcServiceAspect {
 					+ (endTime - ThreadLocalHolder.getBegin()) + t, t);
 			throw t;
 		} finally {
-			if (!rpcService.isAsyn() && null != logService && logService.isNeedLog()) {
+			if (ThreadLocalHolder.getStatus() >= 0 && !rpcService.isAsyn() && null != logService
+					&& logService.isNeedLog()) {
 				StringBuilder argSB = new StringBuilder(2048);
 				argSB.append("used time:");
 				argSB.append(AdamTimeUtil.getNow() - ThreadLocalHolder.getBegin());
 				argSB.append(AdamSysConstants.COLUMN_SPE);
 				argSB.append(ILogService.obj2Str(returnValue));
 				logService.sendEndRequestLog(argSB);
+				ThreadLocalHolder.setStatus(-1);
 			}
 		}
 		return returnValue;

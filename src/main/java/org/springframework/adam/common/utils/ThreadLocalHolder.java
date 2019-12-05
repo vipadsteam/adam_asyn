@@ -21,7 +21,22 @@ public class ThreadLocalHolder {
 		}
 		String runningAccountId = AdamUUIDUtils.getUUID();
 		th.setRunningAccountId(runningAccountId);
+		th.setStatus(0);
 		th.setBegin(AdamTimeUtil.getNow());
+	}
+
+	public static int getStatus() {
+		if (null == contextHolder.get()) {
+			initRunningAccount();
+		}
+		return contextHolder.get().getStatus();
+	}
+
+	public static void setStatus(int status) {
+		if (null == contextHolder.get()) {
+			initRunningAccount();
+		}
+		contextHolder.get().setStatus(status);
 	}
 
 	public static long getBegin() {

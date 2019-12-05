@@ -9,6 +9,8 @@ package org.springframework.adam.common.bean;
  */
 public class ThreadHolder {
 
+	private int status; // 0 begin, -1 end
+
 	private long begin;
 
 	private String runningAccountId;
@@ -18,6 +20,14 @@ public class ThreadHolder {
 	private Integer requestLogFlag;
 
 	private String remark;
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
 
 	public long getBegin() {
 		return begin;
@@ -60,6 +70,7 @@ public class ThreadHolder {
 	}
 
 	public void copy(ThreadHolder threadHolder) {
+		this.status = threadHolder.getStatus();
 		this.begin = threadHolder.getBegin();
 		this.runningAccountId = threadHolder.getRunningAccountId();
 		this.runningAccountFlag = threadHolder.getRunningAccountFlag();
@@ -69,6 +80,7 @@ public class ThreadHolder {
 
 	public ThreadHolder clone() {
 		ThreadHolder th = new ThreadHolder();
+		th.setStatus(this.getStatus());
 		th.setBegin(this.begin);
 		th.setRunningAccountId(this.runningAccountId);
 		th.setRunningAccountFlag(this.runningAccountFlag);
@@ -83,8 +95,10 @@ public class ThreadHolder {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder(512);
-		builder.append("ThreadHolder [begin=");
+		StringBuilder builder = new StringBuilder(128);
+		builder.append("ThreadHolder [status=");
+		builder.append(status);
+		builder.append(", begin=");
 		builder.append(begin);
 		builder.append(", runningAccountId=");
 		builder.append(runningAccountId);
