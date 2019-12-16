@@ -55,7 +55,11 @@ public class LocalIpHolder {
 		return localIp;
 	}
 
-	private static void initLocalIp() throws Exception {
+	private synchronized static void initLocalIp() throws Exception {
+		if (null != localIp) {
+			return;
+		}
+
 		Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 		String thisIp = "";
 		while (e.hasMoreElements()) {
@@ -90,10 +94,19 @@ public class LocalIpHolder {
 		return pid;
 	}
 
-	private static void initPid() {
+	private synchronized static void initPid() {
+		if (null != pid) {
+			return;
+		}
 		String pidTmp = ManagementFactory.getRuntimeMXBean().getName();
 		String[] pidTmpArr = pidTmp.split("@");
 		pid = pidTmpArr[0];
 	}
 
+	
+	public static void main(String[] args) {
+		System.out.println(LocalIpHolder.getIp());
+		System.out.println(LocalIpHolder.getPid());
+		System.out.println(LocalIpHolder.getInstanceId());
+	}
 }
