@@ -40,7 +40,7 @@ public class LocalIpHolder {
 	}
 
 	private static String getInstanceId(String ip, String pid) {
-		return ip + ":" + pid;
+		return ip + "_" + pid;
 	}
 
 	public static String getIp() {

@@ -9,7 +9,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.springframework.adam.backpressure.BackPressureUtils;
+import org.springframework.adam.backpressure.AdamBackPressureUtils;
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.ThreadHolder;
 import org.springframework.adam.common.utils.ThreadLocalHolder;
@@ -177,7 +177,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 					doit(result, e, type);
 				});
 			} catch (RejectedExecutionException r) {
-				BackPressureUtils.errIncrease(r);
+				AdamBackPressureUtils.errIncrease();
 				dealException(r);
 				Executor tpe = BakThreadPoolContainer.getBakThreadPool();
 				tpe.execute(() -> {
@@ -231,7 +231,7 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 				break;
 			}
 		} catch (Throwable t) {
-			BackPressureUtils.errIncrease(t);
+			AdamBackPressureUtils.errIncrease();
 			dealException(t);
 		} finally {
 			// 如果是complete就没必要再onComplete, complete完了就workNext
@@ -303,7 +303,8 @@ public abstract class AbsCallbacker<ResultType, ErrorType extends Throwable, Inc
 		}
 		try {
 			if (!latch.await(waitTime, TimeUnit.SECONDS)) {
-				throw new RuntimeException("callback wait service chain timeout:" + this.getClass().getName() + " for time:" + waitTime + " seconds.");
+				throw new RuntimeException("callback wait service chain timeout:" + this.getClass().getName()
+						+ " for time:" + waitTime + " seconds.");
 			}
 		} catch (InterruptedException e) {
 			throw new RuntimeException("callback error can not wait service chain and output", e);

@@ -2,107 +2,115 @@ package org.springframework.adam.backpressure;
 
 public class BPDic {
 
-	private static boolean autoRateFlag = false;
+	private boolean autoRateFlag = false;
 
-	private static String minRate = "";
+	private String minRate = "";
 
-	private static String maxRate = "";
+	private String maxRate = "";
 
-	private static String errorStep = "";
+	private String errorStep = "";
 
-	private static String fixStep = "";
+	private String fixStep = "";
 
-	public static void update(String key, String value) {
-		if ("bp_arf".equals(key)) {
-			if ("TRUE".equals(value)) {
-				autoRateFlag = true;
-			} else {
-				autoRateFlag = false;
-			}
-		} else if ("bp_minRate".equals(key)) {
+	/**
+	 * @param key
+	 * @param value
+	 * @return is changed
+	 */
+	public boolean update(String key, String value) {
+		boolean result = false;
+		if ("arf".equals(key)) {
+			boolean autoRateFlagTmp = "Y".equals(value);
+			result = (autoRateFlagTmp != autoRateFlag);
+			autoRateFlag = autoRateFlagTmp;
+		} else if ("minRate".equals(key)) {
+			result = (minRate != value);
 			minRate = value;
-		} else if ("bp_maxRate".equals(key)) {
+		} else if ("maxRate".equals(key)) {
+			result = (maxRate != value);
 			maxRate = value;
-		} else if ("bp_errorStep".equals(key)) {
+		} else if ("errorStep".equals(key)) {
+			result = (errorStep != value);
 			errorStep = value;
-		} else if ("bp_fixStep".equals(key)) {
+		} else if ("fixStep".equals(key)) {
+			result = (fixStep != value);
 			fixStep = value;
 		}
+		return result;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isAutoRateFlag() {
+		return autoRateFlag;
+	}
+
+	/**
+	 * @param autoRateFlag
+	 */
+	public void setAutoRateFlag(boolean autoRateFlag) {
+		this.autoRateFlag = autoRateFlag;
 	}
 
 	/**
 	 * @return the minRate
 	 */
-	public static String getMinRate() {
-		return minRate;
+	public String getMinRate() {
+		return this.minRate;
 	}
 
 	/**
 	 * @param minRate
 	 *            the minRate to set
 	 */
-	public static void setMinRate(String minRate) {
-		BPDic.minRate = minRate;
+	public void setMinRate(String minRate) {
+		this.minRate = minRate;
 	}
 
 	/**
 	 * @return the maxRate
 	 */
-	public static String getMaxRate() {
-		return maxRate;
+	public String getMaxRate() {
+		return this.maxRate;
 	}
 
 	/**
 	 * @param maxRate
 	 *            the maxRate to set
 	 */
-	public static void setMaxRate(String maxRate) {
-		BPDic.maxRate = maxRate;
+	public void setMaxRate(String maxRate) {
+		this.maxRate = maxRate;
 	}
 
 	/**
 	 * @return the errorStep
 	 */
-	public static String getErrorStep() {
-		return errorStep;
+	public String getErrorStep() {
+		return this.errorStep;
 	}
 
 	/**
 	 * @param errorStep
 	 *            the errorStep to set
 	 */
-	public static void setErrorStep(String errorStep) {
-		BPDic.errorStep = errorStep;
+	public void setErrorStep(String errorStep) {
+		this.errorStep = errorStep;
 	}
 
 	/**
 	 * @return the fixStep
 	 */
-	public static String getFixStep() {
-		return fixStep;
+	public String getFixStep() {
+		return this.fixStep;
 	}
 
 	/**
 	 * @param fixStep
 	 *            the fixStep to set
 	 */
-	public static void setFixStep(String fixStep) {
-		BPDic.fixStep = fixStep;
-	}
-
-	/**
-	 * @return the autoRateFlag
-	 */
-	public static boolean isAutoRateFlag() {
-		return autoRateFlag;
-	}
-
-	/**
-	 * @param autoRateFlag
-	 *            the autoRateFlag to set
-	 */
-	public static void setAutoRateFlag(boolean autoRateFlag) {
-		BPDic.autoRateFlag = autoRateFlag;
+	public void setFixStep(String fixStep) {
+		this.fixStep = fixStep;
 	}
 
 }

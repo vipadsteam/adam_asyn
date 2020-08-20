@@ -37,6 +37,11 @@ public interface AdamSysConstants {
 	 * @Fields COLUMN_SPE
 	 */
 	public static final String COLUMN_SPE = "|";
+	
+	/**
+	 * @Fields COLUMN_ATE
+	 */
+	public static final String COLUMN_ATE = "@";
 
 	/**
 	 * @Fields PROPERITY_CHARSET

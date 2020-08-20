@@ -9,6 +9,8 @@ package org.springframework.adam.common.bean;
  */
 public class ThreadHolder {
 
+	private String name;
+
 	private int status; // 0 begin, -1 end
 
 	private long begin;
@@ -20,6 +22,14 @@ public class ThreadHolder {
 	private Integer requestLogFlag;
 
 	private String remark;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public int getStatus() {
 		return status;

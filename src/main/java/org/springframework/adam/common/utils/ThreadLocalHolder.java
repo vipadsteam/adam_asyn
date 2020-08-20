@@ -25,13 +25,27 @@ public class ThreadLocalHolder {
 		th.setBegin(AdamTimeUtil.getNow());
 	}
 
+	public static String getName() {
+		if (null == contextHolder.get()) {
+			initRunningAccount();
+		}
+		return contextHolder.get().getName();
+	}
+
+	public static void setName(String name) {
+		if (null == contextHolder.get()) {
+			initRunningAccount();
+		}
+		contextHolder.get().setName(name);
+	}
+	
 	public static int getStatus() {
 		if (null == contextHolder.get()) {
 			initRunningAccount();
 		}
 		return contextHolder.get().getStatus();
 	}
-
+	
 	public static void setStatus(int status) {
 		if (null == contextHolder.get()) {
 			initRunningAccount();

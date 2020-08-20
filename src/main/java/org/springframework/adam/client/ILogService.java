@@ -39,6 +39,15 @@ public interface ILogService {
 	default void sendEndRequestLog(Object obj) {
 		return;
 	}
+	
+	/**
+	 * 请求完成日志
+	 * 
+	 * @param obj
+	 */
+	default void sendBackPressureLog(Object... objs) {
+		return;
+	}
 
 	/**
 	 * 是否要记日志

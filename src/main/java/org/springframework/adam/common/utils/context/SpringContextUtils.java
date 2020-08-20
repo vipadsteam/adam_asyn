@@ -3,12 +3,12 @@ package org.springframework.adam.common.utils.context;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.adam.client.ILogService;
 import org.springframework.adam.service.chain.ServiceChain;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,12 @@ public class SpringContextUtils implements InitializingBean {
 	@Autowired
 	private ApplicationContext applicationContextTmp;
 
+	@Autowired(required = false)
+	private ILogService logServiceTmp;
+
 	private static ApplicationContext applicationContext;
+
+	private static ILogService logService;
 
 	private static Logger logger = LoggerFactory.getLogger(SpringContextUtils.class);
 
@@ -43,6 +48,10 @@ public class SpringContextUtils implements InitializingBean {
 	public static ApplicationContext getApplicationContext() {
 		assertContextInjected();
 		return applicationContext;
+	}
+
+	public static ILogService getLogService() {
+		return logService;
 	}
 
 	public static String getRootRealPath() {
@@ -115,7 +124,8 @@ public class SpringContextUtils implements InitializingBean {
 	 */
 	private static void registerBean(String beanName, BeanDefinition beanDefinition) {
 		ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
-		BeanDefinitionRegistry beanDefinitonRegistry = (BeanDefinitionRegistry) configurableApplicationContext.getBeanFactory();
+		BeanDefinitionRegistry beanDefinitonRegistry = (BeanDefinitionRegistry) configurableApplicationContext
+				.getBeanFactory();
 		beanDefinitonRegistry.registerBeanDefinition(beanName, beanDefinition);
 	}
 
@@ -123,7 +133,8 @@ public class SpringContextUtils implements InitializingBean {
 	 * 检查ApplicationContext不为空.
 	 */
 	private static void assertContextInjected() {
-		Validate.isTrue(applicationContext != null, "applicaitonContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder.");
+		Validate.isTrue(applicationContext != null,
+				"applicaitonContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder.");
 	}
 
 	public static boolean isContextInjected() {
@@ -222,5 +233,9 @@ public class SpringContextUtils implements InitializingBean {
 
 		ServiceChain serviceChain = applicationContext.getBean(ServiceChain.class);
 		serviceChain.init();
+
+		if (this.logServiceTmp != null) {
+			SpringContextUtils.logService = logServiceTmp; // NOSONAR
+		}
 	}
 }

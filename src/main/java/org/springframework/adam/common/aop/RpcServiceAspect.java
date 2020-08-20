@@ -6,13 +6,13 @@ package org.springframework.adam.common.aop;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.adam.client.ILogService;
-import org.springframework.adam.common.bean.RequestLogEntity;
 import org.springframework.adam.common.bean.annotation.service.RpcService;
 import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
 import org.springframework.adam.common.bean.contants.AdamSysConstants;
@@ -61,6 +61,13 @@ public class RpcServiceAspect {
 		Object returnValue = null;
 
 		ThreadLocalHolder.initRunningAccount();
+		// 为每个接口设置个名
+		String name = rpcService.name();
+		if (StringUtils.isBlank(name)) {
+			name = methodName;
+		}
+		ThreadLocalHolder.setName(name);
+
 		returnValue = doBefore(methodName, null, args, returnValue);
 		String runningAccount = ThreadLocalHolder.getRunningAccount();
 		try {

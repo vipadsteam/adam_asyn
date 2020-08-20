@@ -21,8 +21,7 @@ public class ServiceChainCallbacker extends AbsCallbacker<Object, Throwable, Obj
 
 	@Override
 	public void dealSuccess(Object result) {
-		// TODO Auto-generated method stub
-
+		// nothing to do
 	}
 
 	@Override
@@ -32,8 +31,7 @@ public class ServiceChainCallbacker extends AbsCallbacker<Object, Throwable, Obj
 
 	@Override
 	public void dealComplete(Object result, Throwable e) {
-		// TODO Auto-generated method stub
-
+		// nothing to do
 	}
 
 	@Override

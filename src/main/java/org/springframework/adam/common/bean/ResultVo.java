@@ -28,6 +28,8 @@ public class ResultVo<T> implements Serializable {
 
 	private static final Log log = LogFactory.getLog(ResultVo.class);
 
+	private String serviceEnum;
+
 	private int serviceIndex = 0;
 
 	private transient List<AbsTasker> taskerList;
@@ -347,6 +349,14 @@ public class ResultVo<T> implements Serializable {
 	 */
 	public AtomicBoolean getIsUsed() {
 		return isUsed;
+	}
+
+	public String getServiceEnum() {
+		return serviceEnum;
+	}
+
+	public void setServiceEnum(String serviceEnum) {
+		this.serviceEnum = serviceEnum;
 	}
 
 	public boolean isAsyn() {

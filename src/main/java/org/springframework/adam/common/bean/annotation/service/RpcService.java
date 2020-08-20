@@ -16,6 +16,16 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RpcService {
 
+	/**
+	 * interface name
+	 * @return
+	 */
+	String name() default "";
+
+	/**
+	 * is this interface asyn
+	 * @return
+	 */
 	boolean isAsyn() default false;
 
 }

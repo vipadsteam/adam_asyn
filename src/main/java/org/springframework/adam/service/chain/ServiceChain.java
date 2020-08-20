@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.adam.backpressure.BackPressureUtils;
+import org.springframework.adam.backpressure.AdamBackPressureUtils;
 import org.springframework.adam.client.ILogService;
 import org.springframework.adam.common.bean.ResultVo;
 import org.springframework.adam.common.bean.annotation.service.ServiceErrorCode;
@@ -26,11 +26,14 @@ import org.springframework.adam.common.bean.contants.AdamSysConstants;
 import org.springframework.adam.common.bean.contants.BaseReslutCodeConstants;
 import org.springframework.adam.common.utils.AdamClassUtils;
 import org.springframework.adam.common.utils.AdamExceptionUtils;
+import org.springframework.adam.common.utils.AdamTimeUtil;
+import org.springframework.adam.common.utils.ThreadLocalHolder;
 import org.springframework.adam.common.utils.context.SpringContextUtils;
 import org.springframework.adam.service.AbsCallbacker;
 import org.springframework.adam.service.AbsTasker;
 import org.springframework.adam.service.AdamFuture;
 import org.springframework.adam.service.CallbackCombiner;
+import org.springframework.adam.service.IRequestHook;
 import org.springframework.adam.service.IService;
 import org.springframework.adam.service.IServiceBefore;
 import org.springframework.adam.service.callback.ServiceChainCallbacker;
@@ -41,6 +44,8 @@ import org.springframework.adam.service.task.DoServiceTasker;
 import org.springframework.adam.service.task.DoSuccessTasker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * @author user
@@ -59,6 +64,9 @@ public class ServiceChain {
 
 	@Autowired(required = false)
 	private ILogService logService;
+
+	@Autowired(required = false)
+	private IRequestHook requestHook;
 
 	private AtomicBoolean isReady = new AtomicBoolean(false);
 
@@ -200,7 +208,8 @@ public class ServiceChain {
 	 * @param serivce
 	 * @param clazz
 	 */
-	private void putServiceInServicesMap(String serviceEnum, int serviceOrderValue, IService serivce, Class clazz, Map<String, List<IService>> servicesMap) {
+	private void putServiceInServicesMap(String serviceEnum, int serviceOrderValue, IService serivce, Class clazz,
+			Map<String, List<IService>> servicesMap) {
 		List<IService> serviceList = servicesMap.get(serviceEnum);
 		if (CollectionUtils.isEmpty(serviceList)) {
 			serviceList = new ArrayList<IService>();
@@ -223,7 +232,8 @@ public class ServiceChain {
 
 			// 不允许有相同的serviceOrder
 			if (serviceOrderValue == serviceOrderTmp.value()) {
-				throw new RuntimeException(tmpClass.getName() + " and " + clazz.getName() + " have same order, is not allowed");
+				throw new RuntimeException(
+						tmpClass.getName() + " and " + clazz.getName() + " have same order, is not allowed");
 			} else if (serviceOrderValue < serviceOrderTmp.value()) {
 				realIndex = index;
 				break;
@@ -233,6 +243,73 @@ public class ServiceChain {
 		}
 		// 这样不会干掉以前的service，但是会在以前的service前插入新的service
 		serviceList.add(realIndex, serivce);
+	}
+
+	/**
+	 * 带requestHook的启动链路调用
+	 * 
+	 * @return
+	 * @throws Exception 
+	 */
+	public Object doServerSyn(Object income, ResultVo output, String serviceEnum) throws Exception {
+		return doServer(income, output, serviceEnum, false);
+	}
+
+	/**
+	 * 带requestHook的启动链路调用
+	 * 
+	 * @return
+	 * @throws Exception 
+	 */
+	public Object doServer(Object income, ResultVo output, String serviceEnum, boolean isAsyn) throws Exception {
+		ThreadLocalHolder.initRunningAccount();
+		String url = serviceEnum + "-chain";
+		ThreadLocalHolder.setName(url);
+		// 新建request对象
+		Object returnValue = null;
+		Object[] args = new Object[] { income };
+		if (null != requestHook) {
+			returnValue = requestHook.doBefore(url, null, args, output);
+		}
+		String runningAccount = ThreadLocalHolder.getRunningAccount();
+		try {
+			// 看看是不是要日志
+			if (null != logService && logService.isNeedLog()) {
+				// 获取参数
+				StringBuilder argSB = new StringBuilder(2048);
+				argSB.append("method:");
+				argSB.append(url);
+				argSB.append(AdamSysConstants.COLUMN_SPE);
+				argSB.append("income:");
+				argSB.append(ILogService.obj2Str(income));
+				logService.sendBeginRequestLog(argSB.toString());
+			}
+			if (returnValue == null) {
+				doServer(income, output, serviceEnum);
+				returnValue = output;
+			}
+			if (null != requestHook) {
+				returnValue = requestHook.doAfter(url, null, args, output);
+			}
+		} finally {
+			if (ThreadLocalHolder.getStatus() >= 0 && !isAsyn && null != logService && logService.isNeedLog()) {
+				ThreadLocalHolder.setStatus(-1);
+				StringBuilder argSB = new StringBuilder(2048);
+				argSB.append("RA:");
+				argSB.append(runningAccount);
+				argSB.append(AdamSysConstants.COLUMN_SPE);
+				argSB.append(url);
+				argSB.append(AdamSysConstants.COLUMN_SPE);
+				argSB.append(ILogService.obj2Str(income));
+				argSB.append(AdamSysConstants.COLUMN_SPE);
+				argSB.append(ILogService.obj2Str(returnValue));
+				argSB.append(AdamSysConstants.COLUMN_SPE);
+				argSB.append("used time:");
+				argSB.append(AdamTimeUtil.getNow() - ThreadLocalHolder.getBegin());
+				logService.sendEndRequestLog(argSB);
+			}
+		}
+		return returnValue;
 	}
 
 	/**
@@ -258,7 +335,8 @@ public class ServiceChain {
 	 * 
 	 * @return
 	 */
-	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, long waitSecond, String serviceEnum) {
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, long waitSecond,
+			String serviceEnum) {
 		return doServerWithCallback(income, output, waitSecond, null, serviceEnum);
 	}
 
@@ -267,7 +345,8 @@ public class ServiceChain {
 	 * 
 	 * @return
 	 */
-	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, Executor tpe, String serviceEnum) {
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, Executor tpe,
+			String serviceEnum) {
 		return doServerWithCallback(income, output, 0, tpe, serviceEnum);
 	}
 
@@ -276,7 +355,8 @@ public class ServiceChain {
 	 * 
 	 * @return
 	 */
-	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, long waitSecond, Executor tpe, String serviceEnum) {
+	public ServiceChainCallbacker doServerWithCallback(Object income, ResultVo output, long waitSecond, Executor tpe,
+			String serviceEnum) {
 		return doServer(income, output, waitSecond, tpe, serviceEnum, true);
 	}
 
@@ -288,9 +368,11 @@ public class ServiceChain {
 	 * @param serviceEnum
 	 * @return
 	 */
-	private ServiceChainCallbacker doServer(Object income, ResultVo output, long waitSecond, Executor tpe, String serviceEnum, boolean isChildChain) {
+	private ServiceChainCallbacker doServer(Object income, ResultVo output, long waitSecond, Executor tpe,
+			String serviceEnum, boolean isChildChain) {
 		// 检查初始化
 		init();
+		output.setServiceEnum(serviceEnum);
 		// 获取任务列表
 		List<AbsTasker> taskList = tasksMap.get(serviceEnum);
 		// 检查任务列表
@@ -356,7 +438,7 @@ public class ServiceChain {
 			tpe.execute(r);
 		} catch (RejectedExecutionException r) {
 			// 背压通知
-			BackPressureUtils.errIncrease(r);
+			AdamBackPressureUtils.errIncrease();
 			// 如果无法执行子链则由本线程执行
 			doTask(income, output);
 		}
@@ -407,7 +489,8 @@ public class ServiceChain {
 					absCallbacker = tasker.doTask(income, output);
 				} else if (DoFailTasker.TYPE.equals(tasker.getType()) && !output.success()) {// 如果失败则走fail
 					absCallbacker = tasker.doTask(income, output);
-				} else if (DoServiceTasker.TYPE.equals(tasker.getType()) || DoComplateTasker.TYPE.equals(tasker.getType())) {// 如果其它的正常处理
+				} else if (DoServiceTasker.TYPE.equals(tasker.getType())
+						|| DoComplateTasker.TYPE.equals(tasker.getType())) {// 如果其它的正常处理
 					absCallbacker = tasker.doTask(income, output);
 				} else if (DoFinalTasker.TYPE.equals(tasker.getType())) {// 如果是finaltask直接运行
 					absCallbacker = tasker.doTask(income, output);
