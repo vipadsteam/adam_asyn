@@ -230,6 +230,12 @@ public class SpringContextUtils implements InitializingBean {
 		}
 
 		SpringContextUtils.applicationContext = applicationContextTmp; // NOSONAR
+		
+		String[] beansName = applicationContext.getBeanNamesForType(ILogService.class);
+		if(null != beansName && beansName.length > 0) {
+			String logName = beansName[0];
+			ILogService logService = getBean(ILogService.class, logName);
+		}
 
 		ServiceChain serviceChain = applicationContext.getBean(ServiceChain.class);
 		serviceChain.init();

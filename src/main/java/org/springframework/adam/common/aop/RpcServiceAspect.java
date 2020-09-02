@@ -75,12 +75,12 @@ public class RpcServiceAspect {
 			if (null != logService && logService.isNeedLog()) {
 				// 获取参数
 				StringBuilder argSB = new StringBuilder(2048);
-				argSB.append("method:");
+				argSB.append("request_begin method:");
 				argSB.append(methodName);
 				argSB.append(AdamSysConstants.COLUMN_SPE);
 				for (Object arg : args) {
 					argSB.append(arg + ":");
-					argSB.append(ILogService.obj2Str(arg));
+					argSB.append(logService.objToStr(arg));
 					argSB.append(AdamSysConstants.COLUMN_SPE);
 				}
 				logService.sendBeginRequestLog(argSB.toString());
@@ -99,10 +99,10 @@ public class RpcServiceAspect {
 			if (ThreadLocalHolder.getStatus() >= 0 && !rpcService.isAsyn() && null != logService
 					&& logService.isNeedLog()) {
 				StringBuilder argSB = new StringBuilder(2048);
-				argSB.append("used time:");
+				argSB.append("request_end used time:");
 				argSB.append(AdamTimeUtil.getNow() - ThreadLocalHolder.getBegin());
 				argSB.append(AdamSysConstants.COLUMN_SPE);
-				argSB.append(ILogService.obj2Str(returnValue));
+				argSB.append(logService.objToStr(returnValue));
 				logService.sendEndRequestLog(argSB);
 				ThreadLocalHolder.setStatus(-1);
 			}

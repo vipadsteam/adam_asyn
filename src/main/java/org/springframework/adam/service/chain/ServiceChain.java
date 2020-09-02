@@ -45,8 +45,6 @@ import org.springframework.adam.service.task.DoSuccessTasker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
-
 /**
  * @author user
  *
@@ -277,11 +275,11 @@ public class ServiceChain {
 			if (null != logService && logService.isNeedLog()) {
 				// 获取参数
 				StringBuilder argSB = new StringBuilder(2048);
-				argSB.append("method:");
+				argSB.append("request_begin method:");
 				argSB.append(url);
 				argSB.append(AdamSysConstants.COLUMN_SPE);
 				argSB.append("income:");
-				argSB.append(ILogService.obj2Str(income));
+				argSB.append(logService.objToStr(income));
 				logService.sendBeginRequestLog(argSB.toString());
 			}
 			if (returnValue == null) {
@@ -295,14 +293,14 @@ public class ServiceChain {
 			if (ThreadLocalHolder.getStatus() >= 0 && !isAsyn && null != logService && logService.isNeedLog()) {
 				ThreadLocalHolder.setStatus(-1);
 				StringBuilder argSB = new StringBuilder(2048);
-				argSB.append("RA:");
+				argSB.append("request_end RA:");
 				argSB.append(runningAccount);
 				argSB.append(AdamSysConstants.COLUMN_SPE);
 				argSB.append(url);
 				argSB.append(AdamSysConstants.COLUMN_SPE);
-				argSB.append(ILogService.obj2Str(income));
+				argSB.append(logService.objToStr(income));
 				argSB.append(AdamSysConstants.COLUMN_SPE);
-				argSB.append(ILogService.obj2Str(returnValue));
+				argSB.append(logService.objToStr(returnValue));
 				argSB.append(AdamSysConstants.COLUMN_SPE);
 				argSB.append("used time:");
 				argSB.append(AdamTimeUtil.getNow() - ThreadLocalHolder.getBegin());

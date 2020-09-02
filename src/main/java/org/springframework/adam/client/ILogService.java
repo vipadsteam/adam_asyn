@@ -18,7 +18,8 @@ public interface ILogService {
 	 * @param remark
 	 * @throws UnknownHostException
 	 */
-	default void sendRunningAccountLog(Object income, ResultVo output, String methodName, String remark, Long beginTime) {
+	default void sendRunningAccountLog(Object income, ResultVo output, String methodName, String remark,
+			Long beginTime) {
 		return;
 	}
 
@@ -39,7 +40,7 @@ public interface ILogService {
 	default void sendEndRequestLog(Object obj) {
 		return;
 	}
-	
+
 	/**
 	 * 请求完成日志
 	 * 
@@ -61,24 +62,41 @@ public interface ILogService {
 		return false;
 	}
 
+	default String getFormatParamStr(Object income, Object output, String methodName, String remark) {
+		String tmpStr = "///methodName: " + methodName + "///remark: " + remark;
+		return tmpStr + "///income: " + objToStr(income) + "///output: " + objToStr(output);
+	}
+
+	default StringBuilder objsToStr(StringBuilder msg, Object[] objs) {
+		for (Object obj : objs) {
+			if (null == obj) {
+				continue;
+			}
+			msg.append(objToStr(obj) + "|");
+		}
+		return msg;
+	}
+
+	/**
+	 * 对象转字符串
+	 * 
+	 * @param income
+	 * @param output
+	 * @param methodName
+	 * @param remark
+	 */
+	default String objToStr(Object income) {
+		return obj2Str(income);
+	}
+
 	static String getFormatParamString(Object income, Object output, String methodName, String remark) {
 		String tmpStr = "///methodName: " + methodName + "///remark: " + remark;
 		return tmpStr + "///income: " + obj2Str(income) + "///output: " + obj2Str(output);
 	}
 
-	static StringBuilder objs2Str(StringBuilder msg, Object[] objs) {
-		for (Object obj : objs) {
-			if (null == obj) {
-				continue;
-			}
-			msg.append(ILogService.obj2Str(obj) + "|");
-		}
-		return msg;
-	}
-
 	static String obj2Str(Object income) {
 		if (null == income) {
-			return "";
+			return "<null>";
 		}
 
 		if (income instanceof Class) {
@@ -99,4 +117,5 @@ public interface ILogService {
 			return income.toString();
 		}
 	}
+
 }
