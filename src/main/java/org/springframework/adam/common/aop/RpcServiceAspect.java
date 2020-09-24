@@ -89,12 +89,6 @@ public class RpcServiceAspect {
 				returnValue = pjp.proceed();
 			}
 			returnValue = doAfter(methodName, null, args, returnValue);
-		} catch (Throwable t) {
-			long endTime = System.currentTimeMillis();
-			logger.error("RA:" + runningAccount + " " + "Method [" + methodName + "] " + AdamSysConstants.COLUMN_SPE
-					+ "returned [" + JSON.toJSONString(returnValue) + "]" + "useTime:"
-					+ (endTime - ThreadLocalHolder.getBegin()) + t, t);
-			throw t;
 		} finally {
 			if (ThreadLocalHolder.getStatus() >= 0 && !rpcService.isAsyn() && null != logService
 					&& logService.isNeedLog()) {

@@ -35,12 +35,6 @@ public class AdamTimeUtil implements InitializingBean {
 
 	private volatile static long now = 0l;
 
-	private volatile static String dateNow = null;
-
-	private volatile static String secondNow = null;
-
-	private volatile static String msNow = null;
-
 	private volatile static AtomicLong idx = new AtomicLong(0);
 
 	/**
@@ -53,27 +47,6 @@ public class AdamTimeUtil implements InitializingBean {
 			init();
 		}
 		return now;
-	}
-
-	public static String getDateNow() {
-		if (null == dateNow) {
-			init();
-		}
-		return dateNow;
-	}
-
-	public static String getSecondNow() {
-		if (null == secondNow) {
-			init();
-		}
-		return secondNow;
-	}
-
-	public static String getMsNow() {
-		if (null == msNow) {
-			init();
-		}
-		return msNow;
 	}
 
 	/**
@@ -130,9 +103,6 @@ public class AdamTimeUtil implements InitializingBean {
 			} else {
 				idx.set(1);
 			}
-			dateNow = ON_DATE_FORMAT.format(now);
-			secondNow = ON_SECOND_FORMAT.format(now);
-			msNow = ON_MILlSECOND_FORMAT.format(now);
 		}, 0, 1, TimeUnit.MILLISECONDS);
 		now = System.currentTimeMillis();
 	}
