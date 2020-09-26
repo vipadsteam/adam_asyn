@@ -69,7 +69,6 @@ public class RpcServiceAspect {
 		ThreadLocalHolder.setName(name);
 
 		returnValue = doBefore(methodName, null, args, returnValue);
-		String runningAccount = ThreadLocalHolder.getRunningAccount();
 		try {
 			// 看看是不是要日志
 			if (null != logService && logService.isNeedLog()) {
@@ -79,7 +78,6 @@ public class RpcServiceAspect {
 				argSB.append(methodName);
 				argSB.append(AdamSysConstants.COLUMN_SPE);
 				for (Object arg : args) {
-					argSB.append(arg + ":");
 					argSB.append(logService.objToStr(arg));
 					argSB.append(AdamSysConstants.COLUMN_SPE);
 				}
